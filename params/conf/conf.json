@@ -1,0 +1,41 @@
+{	
+"paths":{"Inputs_path" : "../Inputs/",
+"Outputs_path":"../Outputs/",
+"folder_preprocessed":"Preprocessed/",
+"folder_models":"Models/",
+"folder_metrics":"Metrics/"
+
+},
+
+"path_log" : "../params/logs/logs.log",
+"log_level" : "INFO",
+
+"__comments_on_selections__":"You can choose the dataset of your choice and the model you want with the 2 following parameters",
+"selected_dataset": "stroke",
+"selected_model":"random_forest",
+
+
+"__comments_on_dictionnary__":"Here you have to write all the information needed when you add a new dataset",
+"dict_info_files": {"drift":{"path_file":"dataset_with_drift.csv",
+							"path_file_preprocessed":"dataset_with_drift_preprocessed.csv",
+							"y_name":"class"},
+					"fraude":{"path_file":"creditcard_fraud.csv",
+							"path_file_preprocessed":"creditcard_fraud_preprocessed.csv",
+							"y_name":"Class"},
+					"stroke":{"path_file":"Stroke.csv",
+							"path_file_preprocessed":"Stroke_preprocessed.csv",
+							"y_name":"stroke"},
+					"banking":{"path_file":"banking.csv",
+							"path_file_preprocessed":"banking_preprocessed.csv",
+							"y_name":"deposit_subscription"},	
+					"diabetic":{"path_file":"diabetic.csv",
+							"path_file_preprocessed":"diabetic_preprocessed.csv",
+							"y_name":"readmitted"},	
+					"wine":{"path_file":"wine_drift.csv",
+							"path_file_preprocessed":"wine_drift_preprocessed.csv",
+							"y_name":"quality"},
+					"marketing":{"path_file":"marketing_data.csv",
+							"path_file_preprocessed":"marketing_preprocessed.csv",
+							"y_name":"Response"}								
+					}
+}
