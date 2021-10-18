@@ -12,7 +12,10 @@ logger = logging.getLogger("main_logger")
 
 #####  Concept drift metrics  #####
 def compute_concept_drift_metrics(
-    sample_df: pd.DataFrame, batch_df: pd.DataFrame, psi_df: pd.DataFrame
+    sample_df: pd.DataFrame,
+    batch_df: pd.DataFrame,
+    n_buckets: int,
+    pred_col: str,
 ) -> dict:
     """Computes the concept drift metrics comparing the distributions of the
     targets in the original dataset and the new batch.
@@ -20,23 +23,60 @@ def compute_concept_drift_metrics(
     Args:
         sample_df (pd.DataFrame): data used to train original model
         batch_df (pd.DataFrame): data received from latest batch
-        psi_df (pd.DataFrame): psi summary dataframe
+        n_buckets (int): number of buckets to split targets in
+        pred_col (str): column name of prediction, for which PSI is computed
 
     Returns:
         dict: concept drift metrics as specified in metrics_example.json
     """
+    # initialize output dict
+    psi_metric = {}
+    psi_df = compute_prob_table(
+        target_col=pred_col,
+        sample_df=sample_df,
+        batch_df=batch_df,
+        n_buckets=n_buckets,
+    )
+    psi = compute_sum_metric(metric_df=psi_df)
+    psi_metric.update({"concept_drift_metrics": {"PSI": psi}})
+
+    return psi_metric
+
+
+#####  Concept drift metrics  #####
+def compute_covariate_drift_metrics(
+    sample_df: pd.DataFrame, batch_df: pd.DataFrame, n_buckets: int
+) -> dict:
+    """Computes the covariate drift metrics comparing the distributions of the
+    covariates in the original dataset and the new batch.
+
+    Args:
+        sample_df (pd.DataFrame): data used to train original model
+        batch_df (pd.DataFrame): data received from latest batch
+        n_buckets (int): number of buckets to split targets in
+
+    Returns:
+        dict: dict: covariate drift metrics as specified in metrics_example.json
+    """
 
     # initialize output dict
-    metrics = {}
+    csi_metrics = {}
+    for col in sample_df.columns:
+        csi_df = compute_prob_table(
+            target_col=col,
+            sample_df=sample_df,
+            batch_df=batch_df,
+            n_buckets=n_buckets,
+        )
+        # compute metrics
+        csi = compute_sum_metric(metric_df=csi_df)
+        csi_metrics.update({col: {"CSI": csi}})
 
-    # compute metrics
-    psi = compute_psi(psi_df=psi_df)
-
-    metrics.update({"concept_drift_metrics": {"PSI": psi}})
-    return metrics
+    return {"covariate_drift_metrics": csi_metrics}
 
 
-def compute_psi(psi_df: pd.DataFrame) -> float:
+### functions for PSI and CSI ###
+def compute_sum_metric(metric_df: pd.DataFrame) -> float:
     """Computes over PSI value
 
     Args:
@@ -48,8 +88,8 @@ def compute_psi(psi_df: pd.DataFrame) -> float:
     """
 
     # get overall PSI
-    psi_total = np.round(sum(psi_df["PSI"]), 3)
-    return psi_total
+    metric_total = np.round(sum(metric_df["PSI"]), 3)
+    return metric_total
 
 
 def compute_prob_table(
@@ -112,6 +152,7 @@ def compute_prob_table(
     psi_df["PSI"] = (psi_df["New Percent"] - psi_df["Initial Percent"]) * np.log(
         psi_df["New Percent"] / psi_df["Initial Percent"]
     )
+    psi_df.replace([np.inf, -np.inf], np.nan, inplace=True)
     psi_df.fillna(0, inplace=True)
 
     return psi_df
