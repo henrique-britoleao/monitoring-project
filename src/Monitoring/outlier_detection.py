@@ -37,7 +37,7 @@ def detect_outliers(df: pd.DataFrame, threshold=-0.05):
     return df_outlier
 
 
-def plot_outliers(df_outlier: pd.DataFrame, path: str):
+def plot_outliers(df_outlier: pd.DataFrame, path: str=None):
     """Save outlier plot from output dataframe of detect_outliers function.
 
     Args:
@@ -49,5 +49,6 @@ def plot_outliers(df_outlier: pd.DataFrame, path: str):
     """
     outlier_plot = sns.histplot(x="scores", data=df_outlier, hue="anomaly")
     fig = outlier_plot.get_figure()
-    fig.savefig(path)
+    if path:
+        fig.savefig(path)
     return fig
