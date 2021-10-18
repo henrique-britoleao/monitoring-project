@@ -8,6 +8,9 @@
             "covariate_drift_metrics": {
                 "numerical_metrics":{
                     "column_1":{
+                        "CSI":{
+                            "csi_value": "double"
+                        },
                         "kruskal_wallis":{
                             "test_value": "double",
                             "p_value": "double"
@@ -17,9 +20,12 @@
                             "p_value": "double"
                         }
                     }
-                }
+                },
                 "categorical_metrics": {
                     "column_1": {
+                        "CSI":{
+                            "csi_value": "double"
+                        },
                         "chi_squared": {
                             "test_value": "double",
                             "p_value": "double"
@@ -28,6 +34,9 @@
                 },
                 "binary_metrics": {
                     "column_1": {
+                        "CSI":{
+                            "csi_value": "double"
+                        },
                         "fisher_test": {
                             "test_value": "double",
                             "p_value": "double"
