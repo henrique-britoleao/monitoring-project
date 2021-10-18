@@ -4,7 +4,7 @@ import seaborn as sns
 from sklearn.ensemble import IsolationForest
 
 
-def detect_outliers(df: pd.DataFrame, threshold=-0.05):
+def detect_outliers(df_processed: pd.DataFrame, threshold: float=-0.05) -> pd.DataFrame:
     """ Detects outliers using the Isolation Forest algorithm and outputs a
     dataframe with an outlier score and anomaly label.
 
@@ -27,9 +27,9 @@ def detect_outliers(df: pd.DataFrame, threshold=-0.05):
         n_jobs=-1,
         random_state=rng,
     )
-    clf.fit(df)
+    clf.fit(df_processed)
 
-    df_outlier["scores"] = clf.decision_function(df)
+    df_outlier["scores"] = clf.decision_function(df_processed)
     df_outlier["anomaly"] = df_outlier["scores"].apply(
         lambda x: "outlier" if x <= threshold else "inlier"
     )
@@ -37,7 +37,7 @@ def detect_outliers(df: pd.DataFrame, threshold=-0.05):
     return df_outlier
 
 
-def plot_outliers(df_outlier: pd.DataFrame, path: str=None):
+def plot_outliers(df_outlier: pd.DataFrame, path: str=None) -> sns.Figure:
     """Save outlier plot from output dataframe of detect_outliers function.
 
     Args:
