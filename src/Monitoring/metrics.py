@@ -53,32 +53,48 @@ def compute_psi(psi_df: pd.DataFrame) -> float:
 
 
 def compute_prob_table(
-    target_col: str, sample_df: pd.DataFrame, batch_df: pd.DataFrame, buckets: int
+    target_col: str, sample_df: pd.DataFrame, batch_df: pd.DataFrame, n_buckets: int
 ) -> pd.DataFrame:
     """Generates dataframe with breakpoint values, counts and percentage count
        for the sample batch and new batch.
 
     Args:
-        target_col (str): name of target column
+        target_col (str): name of column to analyse (y for PSI, variables for CSI)
         sample_df (pd.DataFrame): data used to train original model
         batch_df (pd.DataFrame): data received from latest batch
-        buckets (int): number of buckets to split targets in
+        n_buckets (int): number of buckets to split targets in
 
     Returns:
         pd.DataFrame: distribution of target values per bucket
     """
+    # save list of categorical values
+    cat_features = [i for i in sample_df.columns if sample_df.dtypes[i] == "object"]
 
-    # save array of target probabilites
-    sample_prob = sample_df[target_col]
-    batch_prob = batch_df[target_col]
+    if target_col in cat_features:
+        # encode category and save in array
+        sample_dist = sample_df[target_col].astype("category").cat.codes
+        batch_dist = batch_df[target_col].astype("category").cat.codes
+        # define number of buckets as number of cats
+        buckets = sample_dist.nunique()
+        breakpoints = np.append(
+            sample_dist.unique(), max(sample_dist.unique()) + 1
+        ).tolist()
+        breakpoints.sort()
 
-    # define probability breakpoints for each bucket
-    raw_breakpoints = np.arange(0, buckets + 1) / (buckets) * 100
-    breakpoints = scale_range(raw_breakpoints, np.min(sample_prob), np.max(sample_prob))
+    else:
+        # save array
+        sample_dist = sample_df[target_col]
+        batch_dist = batch_df[target_col]
+        buckets = n_buckets
+        # define probability breakpoints for each bucket
+        raw_breakpoints = np.arange(0, buckets + 1) / (buckets) * 100
+        breakpoints = scale_range(
+            raw_breakpoints, np.min(sample_dist), np.max(sample_dist)
+        )
 
     # value count of probabilities for each bucket
-    sample_counts = np.histogram(sample_prob, breakpoints)[0]
-    batch_counts = np.histogram(batch_prob, breakpoints)[0]
+    sample_counts = np.histogram(sample_dist, breakpoints)[0]
+    batch_counts = np.histogram(batch_dist, breakpoints)[0]
 
     # create dataframe with buckets for each breakpoint value, counts for dev and new probabilities
     psi_df = pd.DataFrame(
@@ -89,13 +105,14 @@ def compute_prob_table(
             "New Count": batch_counts,
         }
     )
-    psi_df["Initial Percent"] = psi_df["Initial Count"] / len(sample_prob)
-    psi_df["New Percent"] = psi_df["New Count"] / len(batch_prob)
+    psi_df["Initial Percent"] = psi_df["Initial Count"] / len(sample_dist)
+    psi_df["New Percent"] = psi_df["New Count"] / len(batch_dist)
 
     # add psi value to each bucket
     psi_df["PSI"] = (psi_df["New Percent"] - psi_df["Initial Percent"]) * np.log(
         psi_df["New Percent"] / psi_df["Initial Percent"]
     )
+    psi_df.fillna(0, inplace=True)
 
     return psi_df
 
