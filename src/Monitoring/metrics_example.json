@@ -6,16 +6,16 @@
                 "PSI": "double"
             },
             "covariate_drift_metrics": {
-                "numerical_metrics":{
-                    "column_1":{
-                        "CSI":{
+                "numerical_metrics": {
+                    "column_1": {
+                        "CSI": {
                             "csi_value": "double"
                         },
-                        "kruskal_wallis":{
+                        "kruskal_wallis": {
                             "test_value": "double",
                             "p_value": "double"
                         },
-                        "kolmogorov_smirnov":{
+                        "kolmogorov_smirnov": {
                             "test_value": "double",
                             "p_value": "double"
                         }
@@ -23,7 +23,7 @@
                 },
                 "categorical_metrics": {
                     "column_1": {
-                        "CSI":{
+                        "CSI": {
                             "csi_value": "double"
                         },
                         "chi_squared": {
@@ -34,7 +34,7 @@
                 },
                 "binary_metrics": {
                     "column_1": {
-                        "CSI":{
+                        "CSI": {
                             "csi_value": "double"
                         },
                         "fisher_test": {
