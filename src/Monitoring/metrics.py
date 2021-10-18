@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 #####  Set logger  #####
-logger = logging.getLogger("main_logger")
+logger = logging.getLogger(__name__)
 
 #####  Covariate drift metrics  #####
 def compute_covariate_drift_metrics(categorical_cols: list, binary_cols: list,
@@ -100,7 +100,9 @@ def compute_statistic(selected_cols: list, sample_df: pd.DataFrame,
         metrics_dict.update(
             {col: {stats_name: {"test_val": test_val, "p_val": p_val}}}
         )
-
+    
+    logger.info(f'Done calculating test statistic: {stats_name}')
+    
     return metrics_dict
 
 
