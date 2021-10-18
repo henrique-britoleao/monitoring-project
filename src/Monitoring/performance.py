@@ -21,7 +21,6 @@ def main_model_evaluation(clf: ClassifierMixin, X_test: pd.DataFrame, y_test: pd
 
     Returns: Dict of classification performance metrics
     """
-
     y_test_pred = np.array([clf.predict(X_test) >= 0.5], dtype=np.float32)[0]
 
     dict_metrics = {}
