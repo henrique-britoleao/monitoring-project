@@ -2,10 +2,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import IsolationForest
+import matplotlib.pyplot as plt
 
 
 def detect_outliers(
-    df_preprocessed: pd.DataFrame, threshold: float = -0.05
+    df_preprocessed: pd.DataFrame, threshold: float = -0.10
 ) -> pd.DataFrame:
     """ Detects outliers using the Isolation Forest algorithm and outputs a
     dataframe with an outlier score and anomaly label.
@@ -39,25 +40,39 @@ def detect_outliers(
     return df_outlier
 
 
-def compute_outlier_percentage(df_preprocessed: pd.DataFrame, path: str) -> float:
-    """Save outlier percentage of dataframe in json file.
+def compute_outlier_percentage(df_preprocessed: pd.DataFrame) -> float:
+    """Compute outlier percentage of dataframe in json file.
 
     Args:
         df_preprocessed (pd.DataFrame): preprocessed data
-        path (string): path and name to save plot
 
     Returns:
-        fig (Figure): plot of outlier and inlier from data
+        outlier_percentage (float): outlier percentage in preprocessed dataset
     """
     df_outliers = detect_outliers(df_preprocessed)
     n_rows = df_outliers.shape[0]
     n_outliers = df_outliers[df_outliers["anomaly"] == "outlier"].shape[0]
-    outlier_percentage = 100 * n_outliers / n_rows
+    outlier_percentage = round(n_outliers / n_rows, 4)
 
     return outlier_percentage
 
 
-def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> sns.Figure:
+def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:
+    """Build outliers dict for batch analysis.
+
+    Args:
+        df_preprocessed (pd.DataFrame): preprocessed data
+
+    Returns:
+        outliers (dict): percentage outlier in dict
+    """
+    outlier_percentage = compute_outlier_percentage(df_preprocessed)
+    outliers = {"percentage_outlier": outlier_percentage}
+
+    return outliers
+
+
+def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> plt.Figure:
     """Save outlier plot from output dataframe of detect_outliers function.
 
     Args:
@@ -70,6 +85,8 @@ def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> sns.Figure
     df_outliers = detect_outliers(df_preprocessed)
     outlier_plot = sns.histplot(x="scores", data=df_outliers, hue="anomaly")
     fig = outlier_plot.get_figure()
+
     if path:
         fig.savefig(path)
+
     return fig

@@ -1,0 +1,43 @@
+{
+    "batch_1": {
+        "date": null,
+        "metrics": {
+            "concept_drift_metrics": {
+                "PSI": "double"
+            },
+            "covariate_drift_metrics": {
+                "numerical_metrics":{
+                    "column_1":{
+                        "kruskal_wallis":{
+                            "test_value": "double",
+                            "p_value": "double"
+                        },
+                        "kolmogorov_smirnov":{
+                            "test_value": "double",
+                            "p_value": "double"
+                        }
+                    }
+                },
+                "categorical_metrics": {
+                    "column_1": {
+                        "chi_squared": {
+                            "test_value": "double",
+                            "p_value": "double"
+                        }
+                    }
+                },
+                "binary_metrics": {
+                    "column_1": {
+                        "fisher_test": {
+                            "test_value": "double",
+                            "p_value": "double"
+                        }
+                    }
+                }
+            }
+        },
+        "outliers": {
+            "percentage_outlier": "double"
+        }
+    }
+}
