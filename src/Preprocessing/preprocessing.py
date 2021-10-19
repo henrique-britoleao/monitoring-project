@@ -100,8 +100,7 @@ class MarketingPreprocessor(Preprocessor):
         
         return data
 
-
-# This part can be optimized as a selection of function from the conf file (as the preprocessing is)
+#####  Splitting  #####
 def basic_split(df, size_of_test, target_column, seed=42):
     """
     Split the dataframe in train, test sets
@@ -121,5 +120,3 @@ def basic_split(df, size_of_test, target_column, seed=42):
         random_state =seed,
     )
     return X_train, X_test, y_train, y_test
-
-
