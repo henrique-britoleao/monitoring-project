@@ -12,9 +12,6 @@ def my_get_logger(path_log, log_level, my_name =""):
     :return: Fichier de log
     """
     
-    #print(path_log)
-    #print(log_level)
-    
     log_level_dict = {"CRITICAL": logging.CRITICAL,
                         "ERROR": logging.ERROR,
                         "WARNING": logging.WARNING,
@@ -22,7 +19,6 @@ def my_get_logger(path_log, log_level, my_name =""):
                         "DEBUG": logging.DEBUG}
     
     LOG_LEVEL = log_level_dict[log_level]
-    #print(LOG_LEVEL)
 
     if my_name != "":
         logger = logging.getLogger(my_name)
@@ -63,5 +59,4 @@ def load_model(conf,name=""):
     return clf
 
 def get_y_column_from_conf(conf):
-
     return conf["dict_info_files"][conf['selected_dataset']]["y_name"]
