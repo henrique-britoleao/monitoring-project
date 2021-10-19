@@ -4,47 +4,37 @@
 import numpy as np
 import pandas as pd
 import logging
+
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import make_column_transformer
 from sklearn.ensemble import IsolationForest
 import plotly.express as px
 from plotly.graph_objs._figure import Figure
+
+import constants as cst
 
 #####  Set logger  #####
 logger = logging.getLogger(__name__)
 
 #####  Outlier detection  #####
-def detect_outliers(
-    df_preprocessed: pd.DataFrame, threshold: float = -0.10
-) -> pd.DataFrame:
-    """ Detects outliers using the Isolation Forest algorithm and outputs a
-    dataframe with an outlier score and anomaly label.
+def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:
+    """Build outliers dict for batch analysis.
 
     Args:
         df_preprocessed (pd.DataFrame): preprocessed data
-        threshold (float): threshold to classify anomaly label based on
-        outlier score
 
     Returns:
-        df_outlier (pd.DataFrame): outlier score and anomaly label
-
+        outliers (dict): percentage outlier in dict
     """
-    df_outlier = pd.DataFrame()
-    rng = np.random.RandomState(42)
+    outlier_percentage = compute_outlier_percentage(df_preprocessed)
+    if outlier_percentage >= 0.05:
+        outlier_alert = 1
+    else:
+        outlier_alert = 0
 
-    clf = IsolationForest(
-        n_estimators=100,
-        max_samples="auto",
-        bootstrap=False,
-        n_jobs=-1,
-        random_state=rng,
-    )
-    clf.fit(df_preprocessed)
+    outliers = {"percentage_outlier": outlier_percentage, "alert": outlier_alert}
 
-    df_outlier["scores"] = clf.decision_function(df_preprocessed)
-    df_outlier["anomaly"] = df_outlier["scores"].apply(
-        lambda x: "outlier" if x <= threshold else "inlier"
-    )
-
-    return df_outlier
+    return outliers
 
 
 def compute_outlier_percentage(df_preprocessed: pd.DataFrame) -> float:
@@ -64,24 +54,46 @@ def compute_outlier_percentage(df_preprocessed: pd.DataFrame) -> float:
     return outlier_percentage
 
 
-def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:
-    """Build outliers dict for batch analysis.
+def detect_outliers(
+    df_preprocessed: pd.DataFrame, threshold: float = -0.10
+) -> pd.DataFrame:
+    """ Detects outliers using the Isolation Forest algorithm and outputs a
+    dataframe with an outlier score and anomaly label.
 
     Args:
         df_preprocessed (pd.DataFrame): preprocessed data
+        threshold (float): threshold to classify anomaly label based on
+        outlier score
 
     Returns:
-        outliers (dict): percentage outlier in dict
+        df_outlier (pd.DataFrame): outlier score and anomaly label
+
     """
-    outlier_percentage = compute_outlier_percentage(df_preprocessed)
-    if outlier_percentage >= 0.05:
-        outlier_alert = 1
-    else:
-        outlier_alert = 0
+    df_outlier = pd.DataFrame()
+    rng = np.random.RandomState(42)
 
-    outliers = {"percentage_outlier": outlier_percentage, "alert": outlier_alert}
+    # One-hot encode categorical columns to apply the model
+    encoder = make_column_transformer(
+        (OneHotEncoder(), cst.categorical_columns), 
+        remainder="passthrough"
+        )
+    df_preprocessed = encoder.fit_transform(df_preprocessed)
 
-    return outliers
+    clf = IsolationForest(
+        n_estimators=100,
+        max_samples="auto",
+        bootstrap=False,
+        n_jobs=-1,
+        random_state=rng,
+    )
+    clf.fit(df_preprocessed)
+
+    df_outlier["scores"] = clf.decision_function(df_preprocessed)
+    df_outlier["anomaly"] = df_outlier["scores"].apply(
+        lambda x: "outlier" if x <= threshold else "inlier"
+    )
+
+    return df_outlier
 
 
 def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> Figure: # TODO: move to dashboard
