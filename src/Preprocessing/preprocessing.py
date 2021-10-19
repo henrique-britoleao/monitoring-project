@@ -11,7 +11,8 @@ import pandas as pd
 #####  Processors  #####
 class Preprocessor(ABC):
     """Abstract class to preprocess supported datasets."""
-    def __call__(self, data: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, data: pd.DataFrame, 
+                 column_types: dict[str, list[str]]) -> pd.DataFrame:
         """Runs a pipeline with the three steps defined in the Preprocessor 
         class.
 
@@ -22,7 +23,7 @@ class Preprocessor(ABC):
             pd.DataFrame: preprocessed data
         """
         clean_data = self.clean_data(data)
-        enforced_data = self.enforce_types(clean_data)
+        enforced_data = self.enforce_types(clean_data, column_types)
         preprocessed_data = self.treat_nans(enforced_data)
         
         return preprocessed_data
@@ -32,8 +33,9 @@ class Preprocessor(ABC):
         """Cleans the columns of the data."""
     
     @abstractmethod
-    def enforce_types(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Ensures all columns are correctly typed."""
+    def enforce_types(self, data: pd.DataFrame, 
+                      column_types: dict[str, list[str]]) -> pd.DataFrame:
+        """Ensures all columns are typed according to configuration file."""
         
     @abstractmethod
     def treat_nans(self, data:pd.DataFrame) -> pd.DataFrame:
@@ -66,17 +68,8 @@ class MarketingPreprocessor(Preprocessor):
         return data
         
     
-    def enforce_types(self, data: pd.DataFrame) -> pd.DataFrame:
-        column_types = {
-            int: ['Year_Birth', 'Kidhome', 'Teenhome', 'Recency', 'MntWines', 
-                  'MntFruits', 'MntMeatProducts', 'MntFishProducts', 
-                  'MntSweetProducts', 'MntGoldProds', 'NumDealsPurchases', 
-                  'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases', 
-                  'NumWebVisitsMonth', 'AcceptedCmp3', 'AcceptedCmp4', 
-                  'AcceptedCmp5', 'AcceptedCmp1', 'AcceptedCmp2', 'Response', 
-                  'Complain'],
-            str: ['Education', 'Marital_Status', 'Income', 'Country'],
-        }
+    def enforce_types(self, data: pd.DataFrame, 
+                      column_types: dict[str, list[str]]) -> pd.DataFrame:
         logger.info('Enforcing types')
         for dtype, cols in column_types.items():
             for col in cols:
