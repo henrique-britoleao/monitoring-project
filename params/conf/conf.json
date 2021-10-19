@@ -10,7 +10,7 @@
 	"log_level": "INFO",
 	"__comments_on_selections__": "You can choose the dataset of your choice and the model you want with the 2 following parameters",
 	"selected_dataset": "marketing",
-	"selected_model": "random_forest",
+	"selected_model": "lightgbm",
 	"__comments_on_dictionnary__": "Here you have to write all the information needed when you add a new dataset",
 	"dict_info_files": {
 		"drift": {
