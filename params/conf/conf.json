@@ -110,6 +110,50 @@
 					"Income",
 					"Country"
 				]
+			},
+			"metrics_setup": {
+				"concept_drift": {
+					"PSI": {
+						"function": "compute_psi",
+						"threshold": 0.2
+					}
+				},
+				"covariate_drift": {
+					"numerical": {
+						"CSI": {
+							"function": "compute_csi_numerical",
+							"threshold": 0.2
+						},
+						"kruskal_wallis": {
+							"function": "compute_kruskal_wallis_test",
+							"threshold": 0.05
+						},
+						"kolmogorov_smirnov": {
+							"function": "compute_kolmogorov_smirnov_test",
+							"threshol": 0.05
+						}
+					},
+					"categorical": {
+						"CSI": {
+							"funtion": "compute_csi_categorical",
+							"threshold": 0.2
+						},
+						"chi_squared": {
+							"function": "compute_chi_sq_stats",
+							"threshold": 0.05
+						}
+					},
+					"binary": {
+						"CSI": {
+							"function": "compute_csi_categorical",
+							"threhsold": 0.2
+						},
+						"fisher_test": {
+							"function": "compute_fisher_stats",
+							"threshold": 0.05
+						}
+					}
+				}
 			}
 		}
 	}
