@@ -15,7 +15,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import make_scorer, f1_score
 
-def main_modeling_from_name (X_train, y_train, conf, categorical_columns, numerical_columns):
+import constants as cst
+
+def main_modeling_from_name (X_train, y_train, conf):
     """
     Main modeling function to fit a model on the training set using the best parameters for the selected model
 
@@ -41,18 +43,18 @@ def main_modeling_from_name (X_train, y_train, conf, categorical_columns, numeri
     estimator, params_grid = function_get_GS_params()
 
     logger.info('Beginning of Grid Search using ' + selected_model)
-    best_params, best_score = main_GS_from_estimator_and_params(X_train, y_train, estimator, params_grid, categorical_columns, numerical_columns)
+    best_params, best_score = main_GS_from_estimator_and_params(X_train, y_train, estimator, params_grid)
 
     function_train = globals()[dict_function_train_model[selected_model]]
-    model = function_train(X_train, y_train, best_params, categorical_columns, numerical_columns)
+    model = function_train(X_train, y_train, best_params)
     logger.info('End of Grid Search using ' + selected_model)
-    logger.info('Best parameteres are :')
+    logger.info('Best parameters are :')
     logger.info(best_params)
-    logger.info('best score' + str(best_score))
+    logger.info('best score :' + str(best_score))
 
     return model, best_params
 
-def main_GS_from_estimator_and_params(X_train: pd.DataFrame, y_train: pd.Series, estimator, params_grid: dict, categorical_columns: list, numerical_columns: list) -> Tuple[dict, float]:
+def main_GS_from_estimator_and_params(X_train: pd.DataFrame, y_train: pd.Series, estimator, params_grid: dict) -> Tuple[dict, float]:
     """
     Main function to run a grid search
 
@@ -70,10 +72,10 @@ def main_GS_from_estimator_and_params(X_train: pd.DataFrame, y_train: pd.Series,
     """
 
     gkf = KFold(n_splits=3, shuffle=True, random_state=42).split(X=X_train, y=y_train)
-    pipeline = build_prediction_pipeline(estimator, categorical_columns, numerical_columns)
+    pipeline = build_prediction_pipeline(estimator)
     
     gsearch = GridSearchCV(estimator=pipeline, param_grid=params_grid, cv=gkf,
-                           scoring=make_scorer(f1_score), verbose=1, n_jobs = -1)
+                           scoring=make_scorer(f1_score), verbose=-1, n_jobs=-1)
     best_model = gsearch.fit(X=X_train, y=y_train)
 
     return best_model.best_params_, best_model.best_score_
@@ -102,7 +104,7 @@ def get_GS_params_lightgbm():
     estimator = lgb.LGBMClassifier()
     return estimator, params_grid
 
-def train_lightgbm(X_train: pd.DataFrame, y_train: pd.Series, params: dict, categorical_columns: list, numerical_columns: list):
+def train_lightgbm(X_train: pd.DataFrame, y_train: pd.Series, params: dict):
     """
     Trains a LightGBM model
     Args:
@@ -114,7 +116,7 @@ def train_lightgbm(X_train: pd.DataFrame, y_train: pd.Series, params: dict, cate
 
     """
     estimator = lgb.LGBMClassifier(**params)
-    pipeline = build_prediction_pipeline(estimator, categorical_columns, numerical_columns)
+    pipeline = build_prediction_pipeline(estimator)
     pipeline.fit(X_train, y_train)
     return pipeline
 
@@ -136,7 +138,7 @@ def get_GS_params_RFClassifier():
 
     return estimator, params_grid
 
-def train_RFClassifier(X_train: pd.DataFrame, y_train: pd.DataFrame, params: dict, categorical_columns: list, numerical_columns: list):
+def train_RFClassifier(X_train: pd.DataFrame, y_train: pd.DataFrame, params: dict):
     """
     Trains a random forest Classifier
     Args:
@@ -146,20 +148,27 @@ def train_RFClassifier(X_train: pd.DataFrame, y_train: pd.DataFrame, params: dic
 
     Returns: trained random forest model
     """
-    estimator = RandomForestClassifier(**params).fit(X_train,y_train)
-    pipeline = build_prediction_pipeline(estimator, categorical_columns, numerical_columns)
+
+    # Extract estimator parameters ("estimator__{value}" not supported by RandomForest)
+    estimator_params = {}
+    for param, param_value in params.items():
+        estimator_params[param.replace("estimator__", "")] = param_value
+
+    estimator = RandomForestClassifier(**estimator_params)
+    pipeline = build_prediction_pipeline(estimator)
+    pipeline.fit(X_train, y_train)
     return pipeline
 
 
 ####### PIPELINE  ########
-def build_prediction_pipeline(estimator, categorical_columns: list, numerical_columns: list):
+def build_prediction_pipeline(estimator):
     """
     Builds a pipeline to combine the column encoder and the estimator
 
     Args:
         estimator: prediction model
     """
-    encoder = create_column_encoder(categorical_columns, numerical_columns)
+    encoder = create_column_encoder(cst.categorical_columns, cst.numerical_columns)
     pipeline = Pipeline(([('encoder', encoder), ('estimator', estimator)]))
     return pipeline
 
@@ -172,7 +181,7 @@ def create_column_encoder(categorical_columns: list, numerical_columns: list):
         categorical_columns (list): list of categorical columns 
     """
     encoder = make_column_transformer(
-        (OneHotEncoder(), categorical_columns), 
+        (OneHotEncoder(handle_unknown="ignore"), categorical_columns), 
         remainder="passthrough"
     )
     return encoder
