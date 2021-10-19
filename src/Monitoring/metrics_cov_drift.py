@@ -13,7 +13,7 @@ import numpy as np
 logger = logging.getLogger("main_logger")
 
 #####  Covariate drift metrics  #####
-StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, dict[str, float]]]
+StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, float]]
 
 def compute_covariate_drift_metrics(
     numerical_cols: list, categorical_cols: list, binary_cols: list,
@@ -127,7 +127,8 @@ def compute_statistics(selected_cols: list, sample_df: pd.DataFrame,
     for col in selected_cols:
         metrics_dict[col] = {}
         # calculate metrics
-        for stats_name, stats_func in stats_dict.items():
+        for stats_name, config_dict in stats_dict.items():
+            stats_func = globals()[config_dict['function']]
             stats_results = stats_func(sample_df[col], batch_df[col])
             # store metrics in dict
             metrics_dict[col].update(
@@ -187,7 +188,7 @@ def compute_csi_numerical(
     """
     # define probability breakpoints for each bucket
     raw_breakpoints = np.arange(0, buckets + 1) / (buckets) * 100
-    breakpoints = scale_range(raw_breakpoints, np.min(sample_data), np.max(sample_data))
+    breakpoints = scale_range(raw_breakpoints, float(np.min(sample_data)), float(np.max(sample_data)))
 
     # value count of probabilities for each bucket
     sample_counts = np.histogram(sample_data, breakpoints)[0]
