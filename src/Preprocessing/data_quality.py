@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from typing import Callable, Tuple
 import logging
 
 import pandas as pd
@@ -101,7 +100,8 @@ def checkNANs(batch_df: pd.DataFrame) -> bool:
     for col in batch_df:
         num_nans = batch_df[col].isnull().sum()
         if num_nans != 0:
-            logger(f"Column: {col} has {num_nans} NAN values ❌")
+            logger.critical(f"Column: {col} has {num_nans} NAN values ❌")
+            # TODO: add error
             break
         else:
             logger.info(f"There is no NAN values in the new set ✔️")
