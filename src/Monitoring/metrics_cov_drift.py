@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from typing import Callable, Tuple
+from typing import Callable
 import logging
 
 from scipy.stats import chi2_contingency, fisher_exact, kruskal, ks_2samp
