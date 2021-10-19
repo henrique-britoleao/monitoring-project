@@ -83,8 +83,7 @@ class MarketingPreprocessor(Preprocessor):
                     raise e
            
         return data
-    
-    
+
     def treat_nans(self, data: pd.DataFrame) -> pd.DataFrame:
         if data.isna().sum().sum() > 0:
             raise ValueError('Found NAN values in the data. Please remove miss'
@@ -93,23 +92,24 @@ class MarketingPreprocessor(Preprocessor):
         
         return data
 
-#####  Splitting  #####
-def basic_split(df, size_of_test, target_column, seed=42):
-    """
-    Split the dataframe in train, test sets
-    Args:
-        df: Dataframe to Split
-        size_of_test: proportion of test dataset
-        X_columns: Columns for the variables
-        y_column: Column for the output
-        seed: Random state/seed
+def basic_split(df: pd.DataFrame, target_column: str, train_size: float = 0.7, seed=42):
+    """Splits the dataframe in train, test sets
 
-    Returns: Train and test datasets for variables and output.
+    Args:
+        df (pd.DataFrame): dataframe to split
+        target_column (str): name of the target variable column
+        train_size (float, optional): proportion of train set as a ratio. Defaults to 0.7
+        seed (int, optional): Random state. Defaults to 42
+
+    Returns:
+        pd.DataFrame, pd.DataFrame, pd.Series, pd.Series: train features, test features, 
+        train labels, test labels
     """
     X_train, X_test, y_train, y_test = train_test_split(
-        df.drop(columns=target_column), 
+        df.drop(columns=[target_column]), 
         df[target_column], 
-        test_size=size_of_test, 
-        random_state =seed,
-    )
+        train_size=train_size, 
+        random_state=seed
+        )
     return X_train, X_test, y_train, y_test
+
