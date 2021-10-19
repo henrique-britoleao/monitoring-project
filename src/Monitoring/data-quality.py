@@ -63,7 +63,7 @@ def check_dtypes(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
             diff_df = (
                 pd.concat([df1.dtypes, df3.dtypes])
                 .drop_duplicates(keep=False)
-                .reset_index()
+                .reset_index()                       #find differences in dtypes
             )
             diff_df.columns = ["colname", "dtype"]
             for name in diff_df.colname.unique():
@@ -71,7 +71,8 @@ def check_dtypes(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
                 dtype_train = diff_df.loc[diff_df.colname == name].iloc[0, 1]
                 dtype_batch = diff_df.loc[diff_df.colname == name].iloc[1, 1]
                 logger.critical(
-                    f'Column "{colname}" has dtype "{dtype_train}" in the train set whereas it has dtype "{dtype_batch}" in the new batch.❌'
+                    f'Column "{colname}" has dtype "{dtype_train}" in the train set '
+                    f'whereas it has dtype "{dtype_batch}" in the new batch.❌'
                 )
         return same_dtypes
 
@@ -87,9 +88,9 @@ def checkNANs(batch_df: pd.DataFrame) -> bool:
         batch_data (pd.DataFrame): new dataframe used to make predictions
     """
     for col in batch_df:
-        num_NaNs = batch_df[col].isnull().sum()
-        if num_NaNs != 0:
-            logger(f"Column: {col} has {num_NaNs} NAN values ❌")
+        num_nans = batch_df[col].isnull().sum()
+        if num_nans != 0:
+            logger(f"Column: {col} has {num_nans} NAN values ❌")
             break
         else:
             logger.info(f"There is no NAN values in the new set ✔️")
