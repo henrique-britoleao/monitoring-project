@@ -47,9 +47,36 @@ def compute_covariate_drift_metrics(
 
     Returns:
         dict: covariate drift metrics as specified in metrics_example.json
+        E.g.: 
+        
+        {
+            "covariate_drift_metrics": {
+                "numerical_metrics": {
+                    "column_1": {
+                        "test_1": {
+                            "test_value": "double"
+                        },
+                        ...
+                    }
+                },
+                "categorical_metrics": {
+                    "column_1": {
+                        "test_1": {
+                            "test_value": "double"
+                        },
+                    }
+                },
+                "binary_metrics": {
+                    "column_1": {
+                        "test_1": {
+                            "test_value": "double"
+                        },
+                    }
+                }
+        }
     """
     # initialize output dict
-    metrics = {}
+    metrics = dict()
     
     dfs = [sample_df, batch_df]
     # compute metrics
