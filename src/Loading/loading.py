@@ -29,8 +29,6 @@ def read_csv_from_path(path):
     Returns: dataframe
 
     """
-    #This function CAN be sophisticated: detection of format, delimiter etc.
-
     df = pd.read_csv(path,sep=";")
     if df.shape[1] == 1:
         df = pd.read_csv(path, sep=",")
