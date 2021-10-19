@@ -130,12 +130,12 @@
 						},
 						"kolmogorov_smirnov": {
 							"function": "compute_kolmogorov_smirnov_test",
-							"threshol": 0.05
+							"threshold": 0.05
 						}
 					},
 					"categorical": {
 						"CSI": {
-							"funtion": "compute_csi_categorical",
+							"function": "compute_csi_categorical",
 							"threshold": 0.2
 						},
 						"chi_squared": {

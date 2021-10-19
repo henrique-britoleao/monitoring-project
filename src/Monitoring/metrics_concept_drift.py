@@ -6,6 +6,9 @@ import numpy as np
 
 import logging
 
+import detect_alert
+from operator import le, lt, ge, gt
+
 #####  Set logger  #####
 logger = logging.getLogger(__name__)
 
@@ -56,7 +59,9 @@ def compute_psi(
     # get overall PSI
     psi_total = np.round(sum(psi_df["PSI"]), 3)
 
-    return {"psi_value": psi_total}
+    alert = detect_alert.alert(psi_total, "PSI", "", "concept_drift", ge)
+
+    return {"psi_value": psi_total, "alert": alert}
 
 def scale_range(input, min, max) -> np.array:
     """Scales the raw breakpoints from 0 to 1.
