@@ -6,7 +6,7 @@ from plotly.graph_objs._figure import Figure
 
 
 def detect_outliers(
-    df_preprocessed: pd.DataFrame, threshold: float = -0.07
+    df_preprocessed: pd.DataFrame, threshold: float = -0.10
 ) -> pd.DataFrame:
     """ Detects outliers using the Isolation Forest algorithm and outputs a
     dataframe with an outlier score and anomaly label.
@@ -67,7 +67,12 @@ def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:
         outliers (dict): percentage outlier in dict
     """
     outlier_percentage = compute_outlier_percentage(df_preprocessed)
-    outliers = {"percentage_outlier": outlier_percentage}
+    if outlier_percentage >= 0.05:
+        outlier_alert = 1
+    else:
+        outlier_alert = 0
+
+    outliers = {"percentage_outlier": outlier_percentage, "alert": outlier_alert}
 
     return outliers
 
