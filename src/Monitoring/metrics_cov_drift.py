@@ -9,6 +9,8 @@ from scipy.stats import chi2_contingency, fisher_exact, kruskal, ks_2samp
 import pandas as pd
 import numpy as np
 
+import constants as cst
+
 #####  Set logger  #####
 logger = logging.getLogger("main_logger")
 
@@ -16,7 +18,6 @@ logger = logging.getLogger("main_logger")
 StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, dict[str, float]]]
 
 def compute_covariate_drift_metrics(
-    numerical_cols: list, categorical_cols: list, binary_cols: list,
     sample_df: pd.DataFrame, batch_df: pd.DataFrame, 
     metrics_dict: dict[str, dict[str, StatisticComputer]]) -> dict:
     """Computes the covariate drift metrics comparing the distributions of the
@@ -80,11 +81,11 @@ def compute_covariate_drift_metrics(
     
     dfs = [sample_df, batch_df]
     # compute metrics
-    numerical_metrics = compute_statistics(numerical_cols, *dfs,
+    numerical_metrics = compute_statistics(cst.numerical_cols, *dfs,
                                            metrics_dict['numerical'])
-    categorical_metrics = compute_statistics(categorical_cols, *dfs, 
+    categorical_metrics = compute_statistics(cst.categorical_cols, *dfs, 
                                              metrics_dict['categorical'])
-    binary_metrics = compute_statistics(binary_cols, *dfs, 
+    binary_metrics = compute_statistics(cst.binary_cols, *dfs, 
                                         metrics_dict['binary'])
 
     # update output dict
