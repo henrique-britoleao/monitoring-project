@@ -6,7 +6,7 @@ from plotly.graph_objs._figure import Figure
 
 
 def detect_outliers(
-    df_preprocessed: pd.DataFrame, threshold: float = -0.075
+    df_preprocessed: pd.DataFrame, threshold: float = -0.07
 ) -> pd.DataFrame:
     """ Detects outliers using the Isolation Forest algorithm and outputs a
     dataframe with an outlier score and anomaly label.
@@ -87,6 +87,7 @@ def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> Figure:
         df_outliers,
         x="scores",
         color="anomaly",
+        title="Isolation Forest Outlier Scoring",
         color_discrete_map={"outlier": "rgb(0, 0, 100)", "inlier": "rgb(0, 200, 200)"},
     )
 
