@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 import plotly.express as px
+from plotly.graph_objs._figure import Figure
 
 
 def detect_outliers(
@@ -71,7 +72,7 @@ def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:
     return outliers
 
 
-def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> px.Figure:
+def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> Figure:
     """Save outlier plot from output dataframe of detect_outliers function.
 
     Args:
