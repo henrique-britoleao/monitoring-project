@@ -1,12 +1,11 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from sklearn.ensemble import IsolationForest
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 
 def detect_outliers(
-    df_preprocessed: pd.DataFrame, threshold: float = -0.10
+    df_preprocessed: pd.DataFrame, threshold: float = -0.075
 ) -> pd.DataFrame:
     """ Detects outliers using the Isolation Forest algorithm and outputs a
     dataframe with an outlier score and anomaly label.
@@ -72,7 +71,7 @@ def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:
     return outliers
 
 
-def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> plt.Figure:
+def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> px.Figure:
     """Save outlier plot from output dataframe of detect_outliers function.
 
     Args:
@@ -83,10 +82,14 @@ def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> plt.Figure
         fig (Figure): plot of outlier and inlier from data
     """
     df_outliers = detect_outliers(df_preprocessed)
-    outlier_plot = sns.histplot(x="scores", data=df_outliers, hue="anomaly")
-    fig = outlier_plot.get_figure()
+    fig = px.histogram(
+        df_outliers,
+        x="scores",
+        color="anomaly",
+        color_discrete_map={"outlier": "rgb(0, 0, 100)", "inlier": "rgb(0, 200, 200)"},
+    )
 
     if path:
-        fig.savefig(path)
+        fig.write_image(path)
 
     return fig
