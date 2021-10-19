@@ -12,6 +12,15 @@ import pandas as pd
 class Preprocessor(ABC):
     """Abstract class to preprocess supported datasets."""
     def __call__(self, data: pd.DataFrame) -> pd.DataFrame:
+        """Runs a pipeline with the three steps defined in the Preprocessor 
+        class.
+
+        Args:
+            data (pd.DataFrame): data to be preprocessed.
+
+        Returns:
+            pd.DataFrame: preprocessed data
+        """
         clean_data = self.clean_data(data)
         enforced_data = self.enforce_types(clean_data)
         preprocessed_data = self.treat_nans(enforced_data)
@@ -91,25 +100,9 @@ class MarketingPreprocessor(Preprocessor):
         
         return data
 
-#####  Preprocessing Utils Functions  ######
-def one_hot_encoder(df, cols):
-    """
-    One hot encoder, while dropping the encoded columns
-    Args:
-        df: dataframe
-        cols: cols to encode
-
-    Returns:dataframe with one hot encoded columns
-
-    """
-    #transform categorical features in OHE
-    df_added = pd.get_dummies(df[cols], prefix=cols)
-    df = pd.concat([df.drop(cols,axis=1), df_added],axis=1)
-    return df
-
 
 # This part can be optimized as a selection of function from the conf file (as the preprocessing is)
-def basic_split(df, size_of_test, X_columns, y_column, seed = 42):
+def basic_split(df, size_of_test, target_column, seed=42):
     """
     Split the dataframe in train, test sets
     Args:
@@ -119,10 +112,14 @@ def basic_split(df, size_of_test, X_columns, y_column, seed = 42):
         y_column: Column for the output
         seed: Random state/seed
 
-    Returns: Train and test datasets for variables and output
-
+    Returns: Train and test datasets for variables and output.
     """
-    X_train, X_test, y_train, y_test = train_test_split(df[X_columns], df[y_column], test_size = size_of_test , random_state =seed )
+    X_train, X_test, y_train, y_test = train_test_split(
+        df.drop(columns=target_column), 
+        df[target_column], 
+        test_size=size_of_test, 
+        random_state =seed,
+    )
     return X_train, X_test, y_train, y_test
 
 
