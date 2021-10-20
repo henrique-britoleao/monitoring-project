@@ -95,7 +95,7 @@ def evaluate_batch(batch_id): # TODO: add possibility to specify batch
     u.append_to_json({batch_name: performance_metrics}, cst.PERFORMANCE_METRICS_FILE_PATH)
     
 
-def main(batch_id, mode):
+def main(batch_id, mode="process"):
     if mode == "process":
         process_batch(batch_id)
     if mode == "evaluate":
