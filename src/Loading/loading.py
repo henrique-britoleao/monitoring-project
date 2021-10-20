@@ -1,26 +1,12 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
 import pandas as pd
 import logging
 logger = logging.getLogger('main_logger')
 
-#Global:
+import constants as cst
 
-
-def read_csv_from_name(conf):
-    """
-    Calls the read_csv_from_path function giving it a path read in the conf file
-    Args:
-        conf: conf file
-
-    Returns: dataframe read from csv
-
-    """
-    selected_dataset = conf['selected_dataset']
-    path = conf["paths"]["Inputs_path"]+ conf["dict_info_files"][selected_dataset]["path_file"]
-
-    return read_csv_from_path(path)
-
-def read_csv_from_path(path):
+def read_csv_from_path(path: Path):
     """
     Reads a csv from a path
     Args:
@@ -32,39 +18,16 @@ def read_csv_from_path(path):
     df = pd.read_csv(path,sep=";")
     if df.shape[1] == 1:
         df = pd.read_csv(path, sep=",")
-    logger.debug('file read : '+ path)
+    logger.debug('Read file: '+ path)
 
     return df
 
-def write_preprocessed_csv_from_name(df,conf):
+def write_csv_from_path(df: pd.DataFrame, path: Path):
     """
-    Writes the preprocessed dataframe
+    Writes the dataframe to the correct file path
     Args:
-        df: preprocessed dataframe
-        conf: conf file
-
-    Returns: "ok"
-
+        df: dataframe to write
+        path: local file path from constants 
     """
-    selected_dataset = conf['selected_dataset']
-    path = conf["paths"]["Outputs_path"]+conf["paths"]["folder_preprocessed"]+conf["dict_info_files"][selected_dataset]["path_file_preprocessed"]
-    df.to_csv(path,sep=";", index =False)
-    logger.debug('file wrote : '+ path)
-
-    return "OK"
-
-def load_preprocessed_csv_from_name(conf):
-    """
-    Loads the preprocessed dataframe
-    Args:
-        conf:  conf file
-
-    Returns: dataframe read
-
-    """
-    selected_dataset = conf['selected_dataset']
-    path = conf["paths"]["Outputs_path"]+conf["paths"]["folder_preprocessed"]+conf["dict_info_files"][selected_dataset]["path_file_preprocessed"]
-    df = read_csv_from_path(path)
-    logger.debug('file read : '+ path)
-
-    return df
+    df.to_csv(path, sep=";", index=False)
+    logger.debug('Wrote file in: '+ path)
