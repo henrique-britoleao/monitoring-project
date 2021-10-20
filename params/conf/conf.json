@@ -50,6 +50,7 @@
 			"path_file": "marketing_data.csv",
 			"path_file_preprocessed": "marketing_preprocessed.csv",
 			"y_name": "Response",
+			"y_labels": ["No Response", "Response"],
 			"column_nature": {
 				"categorical_columns": [
 					"Education",

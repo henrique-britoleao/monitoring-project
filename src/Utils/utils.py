@@ -7,6 +7,8 @@ import os
 
 import constants as cst
 
+logger = logging.getLogger(__name__)
+
 def my_get_logger(path_log, log_level, my_name =""):
     """
     Instanciation du logger et paramétrisation
@@ -44,27 +46,25 @@ def my_get_logger(path_log, log_level, my_name =""):
     return logger
 
 
-def save_model(clf, conf, name =""):
+def save_model(clf, name=""):
     if len(name)==0:
-        name = conf['selected_dataset']+'_'+conf['selected_model']
-    filename = conf["paths"]["Outputs_path"]+conf["paths"]["folder_models"] + name+'.sav'
+        name = f"{cst.selected_dataset}_{cst.selected_model}"
+    filename = cst.MODELS_PATH + name + ".sav"
     pickle.dump(clf, open(filename, 'wb'))
-    logger.info('Modele sauvergarde: ' + filename)
-    return 'OK'
+    logger.info('Saved model: ' + filename)
 
-def load_model(conf,name=""):
+def load_model(name=""):
     if len(name)==0:
-        name = conf['selected_dataset']+'_'+conf['selected_model']
-    filename = conf["paths"]["Outputs_path"]+conf["paths"]["folder_models"] + name+'.sav'
-    print(filename)
-    clf = pickle.load( open(filename, 'rb'))
-    logger.info('Modele charge: ' + filename)
+        name = f"{cst.selected_dataset}_{cst.selected_model}"
+    filename = cst.MODELS_PATH + name + ".sav"
+    clf = pickle.load(open(filename, 'rb'))
+    logger.info('Loaded model: ' + filename)
     return clf
 
-def get_y_column_from_conf(conf):
-    return conf["dict_info_files"][conf['selected_dataset']]["y_name"]
+def get_y_column_from_conf():
+    return cst.y_name
 
-def save_training_performance_metrics(metrics: dict, conf: dict) -> None:
+def save_training_performance_metrics(metrics: dict): #conf: dict) -> None:
     """
     Saves the dictionary containing model performance metrics to a json file
 
@@ -72,9 +72,10 @@ def save_training_performance_metrics(metrics: dict, conf: dict) -> None:
         metrics (dict): Dict of classification performance metrics
         conf (dict): Configuration file stored as a json object
     """
-    with open(conf['paths']['Outputs_path'] + conf['paths']['folder_metrics'] + 'training_metrics_'
-            + conf['selected_dataset'] + "_" + conf['selected_model'] + '.txt', 'w') as outfile:
-        json.dump(str(metrics), outfile)
+    # with open(conf['paths']['Outputs_path'] + conf['paths']['folder_metrics'] + 'training_metrics_'
+    #         + conf['selected_dataset'] + "_" + conf['selected_model'] + '.txt', 'w') as outfile:
+    #     json.dump(str(metrics), outfile)
+    pass
         
 def load_batch(batch_id: str) -> pd.DataFrame:
     batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
