@@ -20,6 +20,7 @@ import monitoring
 import data_quality  
 import train_model
 import outlier_detection
+import evaluation
 
 import constants as cst
 import logging, json, pickle
@@ -44,13 +45,13 @@ def process_batch(batch_id):
     data_quality_alerts = data_quality.check_data_quality(batch_df, sample_df)
     # preprocess batch data
     batch_preprocessed = batch_preprocess(batch_df, cst.column_types, preprocessing.MarketingPreprocessor())
+    save_preprocessed_batch(batch_preprocessed)
     
     # load preprocessed sample data
     sample_preprocesssed = loading.read_csv_from_path(cst.PREPROCESSED_TRAIN_FILE_PATH)
     # load model
     model = u.load_model()
     predicted_batch = train_model.make_predictions_on_training_data(model, batch_preprocessed)
-    save_predicted_batch(predicted_batch)
     
     # load predicted sample
     predicted_sample = loading.read_csv_from_path(cst.PREDICTED_TRAIN_FILE_PATH)
@@ -75,12 +76,24 @@ def process_batch(batch_id):
     
     logger.info(f'Done creating records for batch {batch_id}')
 
-    with open(cst.MONITORING_METRICS_FILE_PATH, 'w') as monitoring_file:
-        json.dump(records, monitoring_file)
-        logger.info(f'Saved batch {batch_id} records to json.')
+    u.append_to_json({batch_name: records}, cst.MONITORING_METRICS_FILE_PATH)
+    
 
-def evaluate_batch(batch_id):
-    pass
+def evaluate_batch(batch_id): # TODO: add possibility to specify batch
+    # build batch name
+    batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)[:-4]
+    # load batch data
+    preprocessed_batch = loading.read_csv_from_path(cst.PREPROCESSED_BATCH_FILE_PATH)
+    # load model
+    model = u.load_model()
+    
+    X_batch = preprocessed_batch.drop(columns=cst.y_name)
+    y_batch = preprocessed_batch[cst.y_name]
+
+    performance_metrics = evaluation.evaluate_model_performance_on_test(model, X_batch, y_batch)
+        
+    u.append_to_json({batch_name: performance_metrics}, cst.PERFORMANCE_METRICS_FILE_PATH)
+    
 
 def main(batch_id, mode):
     if mode == "process":
@@ -93,13 +106,13 @@ def batch_preprocess(batch_df: pd.DataFrame, column_types: dict[str, list[str]],
     return preprocessor(batch_df, column_types)
 
 
-def save_predicted_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
+def save_preprocessed_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
     """Save training data with predicted labels and corresponding probabilities
 
     Args:
         sample_df_preprocessed_pred (pd.DataFrame): preprocessed train data with predictions
     """
-    loading.write_csv_from_path(sample_df_preprocessed_pred, cst.PREDICTED_BATCH_FILE_PATH)
+    loading.write_csv_from_path(sample_df_preprocessed_pred, cst.PREPROCESSED_BATCH_FILE_PATH)
     logger.info('Saved batch predicitons')
 
 
