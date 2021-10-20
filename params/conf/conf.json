@@ -50,7 +50,10 @@
 			"file_name": "marketing_data.csv",
 			"file_name_preprocessed": "marketing_preprocessed.csv",
 			"y_name": "Response",
-			"y_labels": ["No Response", "Response"],
+			"y_labels": [
+				"No Response",
+				"Response"
+			],
 			"column_nature": {
 				"categorical_columns": [
 					"Education",
@@ -108,7 +111,9 @@
 					"Response",
 					"Complain"
 				],
-				"float":["Income"],
+				"float": [
+					"Income"
+				],
 				"str": [
 					"Education",
 					"Marital_Status",
@@ -124,6 +129,9 @@
 				},
 				"covariate_drift": {
 					"numerical": {
+						"ADWIN": {
+							"function": "detect_drift_adwin_method"
+						},
 						"CSI": {
 							"function": "compute_csi_numerical",
 							"threshold": 0.2

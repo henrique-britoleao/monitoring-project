@@ -6,6 +6,8 @@ import logging
 
 from scipy.stats import chi2_contingency, fisher_exact, kruskal, ks_2samp
 
+from skmultiflow.drift_detection import ADWIN, HDDM_A
+
 import pandas as pd
 import numpy as np
 
@@ -284,6 +286,36 @@ def compute_csi_categorical(
     return {"csi_value": csi_total, "alert": alert}
 
 
+#####  Compute data drift  #####
+def detect_drift_adwin_method(sample_data: pd.Series, batch_data: pd.Series) -> dict[str, int]:
+    """
+    TODO: redo this
+    Detects numerical drift by adding stream elements from the new batch to ADWIN
+    and verifying if drift occurred (in the batch data only).
+    
+    Args:
+        numerical_cols (list): column names containg numerical variables
+        sample_df (pd.DataFrame): data used to train original model
+        batch_df (pd.DataFrame): data received from latest batch
+    Return:
+        None
+    """
+    adwin = ADWIN()
+    data_stream = np.concatenate((sample_data, batch_data))
+    col_name = sample_data.name
+    
+    # initialize alert
+    alert = 0
+    
+    # Adding stream elements to ADWIN and verifying if drift occurred
+    for i in range(len(data_stream)):
+        adwin.add_element(data_stream[i])
+        if adwin.detected_change():
+            alert = 1
+            logger.warning('Change detected in data: ' + str(data_stream[i]) + ' - at index: ' + str(i) + 'for column:' + col_name)
+            
+    return {"alert": alert}
+    
 #####  Utils functions  #####
 def build_contingency_table(sample_data: pd.Series, 
                             batch_data: pd.Series) -> pd.DataFrame:
