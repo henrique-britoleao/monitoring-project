@@ -34,7 +34,7 @@ logging.basicConfig(filename = cst.LOG_FILE_PATH,
 
 logger = logging.getLogger(__name__)
 
-def main(batch_id):
+def process_batch(batch_id):
     # load batch data
     batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
     batch_df = loading.read_csv_from_path(os.path.join(cst.BATCHES_PATH, batch_name))
@@ -72,9 +72,21 @@ def main(batch_id):
     records[batch_name].update({'data_quality': data_quality_alerts})
     records[batch_name].update({'metrics': monitoring_metrics})
     records[batch_name].update({'outliers': outlier_alerts})
+    
+    logger.info(f'Done creating records for batch {batch_id}')
 
     with open(cst.MONITORING_METRICS_FILE_PATH, 'w') as monitoring_file:
         json.dump(records, monitoring_file)
+        logger.info(f'Saved batch {batch_id} records to json.')
+
+def evaluate_batch(batch_id):
+    pass
+
+def main(batch_id, mode):
+    if mode == "process":
+        process_batch(batch_id)
+    if mode == "evaluate":
+        evaluate_batch(batch_id)
         
 
 def batch_preprocess(batch_df: pd.DataFrame, column_types: dict[str, list[str]], preprocessor: preprocessing.Preprocessor):
@@ -88,7 +100,8 @@ def save_predicted_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
         sample_df_preprocessed_pred (pd.DataFrame): preprocessed train data with predictions
     """
     loading.write_csv_from_path(sample_df_preprocessed_pred, cst.PREDICTED_BATCH_FILE_PATH)
+    logger.info('Saved batch predicitons')
 
 
 if __name__ == "__main__":
-    main(1)
+    main(1, 'process')
