@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import pandas as pd
 import logging
 import pickle
 import json
-logger = logging.getLogger('main_logger')
+import os
 
+import constants as cst
 
 def my_get_logger(path_log, log_level, my_name =""):
     """
@@ -73,3 +75,9 @@ def save_training_performance_metrics(metrics: dict, conf: dict) -> None:
     with open(conf['paths']['Outputs_path'] + conf['paths']['folder_metrics'] + 'training_metrics_'
             + conf['selected_dataset'] + "_" + conf['selected_model'] + '.txt', 'w') as outfile:
         json.dump(str(metrics), outfile)
+        
+def load_batch(batch_id: str) -> pd.DataFrame:
+    batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
+    batch_path = os.path.join(cst.BATCHES_PATH, batch_name)
+    
+    return pd.read_csv(batch_path)

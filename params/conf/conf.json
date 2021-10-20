@@ -1,8 +1,10 @@
 {
 	"paths": {
 		"Inputs_path": "../Inputs/",
+		"folder_batches": "Batches/",
 		"Outputs_path": "../Outputs/",
 		"folder_preprocessed": "Preprocessed/",
+		"folder_predictions": "Predictions/",
 		"folder_models": "Models/",
 		"folder_metrics": "Metrics/",
 		"folder_monitoring": "Monitoring/"
