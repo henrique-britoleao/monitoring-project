@@ -118,13 +118,3 @@ def save_preprocessed_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
 
 if __name__ == "__main__":
     main(1, 'process')
-    
-    
-def retrain_model():
-    # get batch data
-    # get sample data
-    # retain model
-    # save model
-    # erase logs
-    
-    pass

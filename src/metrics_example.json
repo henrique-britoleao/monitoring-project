@@ -12,7 +12,7 @@
                 "alert": "int"
             },
             "metrics": {
-                "concept_drift_metrics": {
+                "PSI": {
                     "PSI": "double",
                     "alert": "int"
                 },
