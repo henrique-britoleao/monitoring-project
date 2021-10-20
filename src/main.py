@@ -29,7 +29,7 @@ import os
 
 import pandas as pd
 
-logging.basicConfig(filename = cst.LOG_FILE_PATH,
+logging.basicConfig(filename = cst.MAIN_LOG_FILE_PATH,
                     filemode = "w",
                     level = logging.INFO)
 
