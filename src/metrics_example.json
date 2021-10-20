@@ -1,0 +1,68 @@
+[
+    {
+        "batch_1": {
+            "date": null,
+            "data_quality": {
+                "alert_nans": "boolean",
+                "alert_names": "boolean",
+                "alert_dtypes": "boolean"
+            },
+            "outliers": {
+                "percentage_outlier": "double",
+                "alert": "boolean"
+            },
+            "metrics": {
+                "concept_drift_metrics": {
+                    "PSI": "double",
+                    "alert": "boolean"
+                },
+                "covariate_drift_metrics": {
+                    "numerical_metrics": {
+                        "column_1": {
+                            "CSI": {
+                                "csi_value": "double",
+                                "alert": "boolean"
+                            },
+                            "kruskal_wallis": {
+                                "test_value": "double",
+                                "p_value": "double",
+                                "alert": "boolean"
+                            },
+                            "kolmogorov_smirnov": {
+                                "test_value": "double",
+                                "p_value": "double",
+                                "alert": "boolean"
+                            }
+                        }
+                    },
+                    "categorical_metrics": {
+                        "column_1": {
+                            "CSI": {
+                                "csi_value": "double",
+                                "alert": "boolean"
+                            },
+                            "chi_squared": {
+                                "test_value": "double",
+                                "p_value": "double",
+                                "alert": "boolean"
+                            }
+                        }
+                    },
+                    "binary_metrics": {
+                        "column_1": {
+                            "CSI": {
+                                "csi_value": "double",
+                                "alert": "boolean"
+                            },
+                            "fisher_test": {
+                                "test_value": "double",
+                                "p_value": "double",
+                                "alert": "boolean"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+]
