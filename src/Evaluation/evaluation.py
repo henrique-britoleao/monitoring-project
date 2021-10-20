@@ -5,12 +5,16 @@ logger = logging.getLogger(__name__)
 
 import pandas as pd
 from sklearn.base import ClassifierMixin
+from sklearn.base import clone
 from sklearn.metrics import recall_score, precision_score, f1_score 
 from sklearn.metrics import accuracy_score, roc_auc_score, jaccard_score
 from sklearn.metrics import confusion_matrix
+
+from Preprocessing import preprocessing
+import constants as cst
 import numpy as np
 
-def main_model_evaluation(clf: ClassifierMixin, X_test: pd.DataFrame, y_test: pd.DataFrame) -> dict:
+def evaluate_model_performance_on_test(clf: ClassifierMixin, X_test: pd.DataFrame, y_test: pd.DataFrame) -> dict:
     """
     Main Evaluation Function: computes metrics and save them into a json file
     Args:
@@ -33,6 +37,27 @@ def main_model_evaluation(clf: ClassifierMixin, X_test: pd.DataFrame, y_test: pd
     metrics['jaccard_score'] = jaccard_score(y_test, y_test_pred)
 
     return metrics
+    
+def cross_evaluate_model_performance(clf: ClassifierMixin, X: pd.DataFrame, y: pd.DataFrame) -> dict:
+    """
+    Main Cross Evaluation Function: computes metrics based on a basic train-test split
+    and save them into a json file
+    Args:
+        clf: trained model used for the metrics
+        X (pd.DataFrame): features
+        y (pd.DataFrame): target
+        conf (dict):  Configuration file stored as a json object
+
+    Returns: Dict of classification performance metrics
+    """
+    df = pd.concat([X, y], axis=1)
+    X_train, X_test, y_train, y_test = preprocessing.basic_split(df, cst.y_name)
+
+    clf2 = clone(clf)
+    clf2.fit(X_train, y_train)
+
+    cv_metrics = evaluate_model_performance_on_test(clf2, X_test, y_test)
+    return cv_metrics
 
 def metric_confusion_matrix(y_true: pd.Series, y_pred: pd.Series) -> dict:
     tn, fp, fn, tp =  confusion_matrix(y_true, y_pred).ravel()
