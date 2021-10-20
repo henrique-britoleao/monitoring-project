@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 
 import constants as cst
+import detect_alert
+from operator import le, lt, ge, gt
 
 #####  Set logger  #####
 logger = logging.getLogger("main_logger")
@@ -145,30 +147,34 @@ def compute_chi_sq_stats(sample_data: pd.Series, batch_data: pd.Series,
     """Wrapper of scipy.stats.chi2_contingency function."""
     contingency_table = build_contingency_table(sample_data, batch_data)
     test_val, p_val, _, _ = chi2_contingency(contingency_table, *kwargs)
+    alert = detect_alert.alert(p_val, "chi_squared", "categorical", "covariate_drift", le)
 
-    return {"test_val": test_val, "p_val": p_val}
+    return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
 def compute_fisher_stats(sample_data: pd.Series, batch_data: pd.Series, 
                          **kwargs):
     """Wrapper of scipy.stats.fisher_exact function."""
     contingency_table = build_contingency_table(sample_data, batch_data)
     test_val, p_val = fisher_exact(contingency_table, *kwargs)
+    alert = detect_alert.alert(p_val, "fisher_test", "binary", "covariate_drift", le)
 
-    return {"test_val": test_val, "p_val": p_val}
+    return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
 def compute_kruskal_wallis_test(sample_data: pd.Series, batch_data: pd.Series, 
                                 **kwargs):
     """Wrapper of scipy.stats.kruskal function."""
     test_val, p_val = kruskal(sample_data, batch_data, **kwargs)
+    alert = detect_alert.alert(p_val, "kruskal_wallis", "numerical", "covariate_drift", le)
     
-    return {"test_val": test_val, "p_val": p_val}
+    return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
 def compute_kolmogorov_smirnov_test(sample_data: pd.Series, 
                                     batch_data: pd.Series, **kwargs):
     """Wrapper of scipy.stats.ks_2samp function."""
     test_val, p_val = ks_2samp(sample_data, batch_data, **kwargs)
+    alert = detect_alert.alert(p_val, "kolmogorov_smirnov", "numerical", "covariate_drift", le)
     
-    return {"test_val": test_val, "p_val": p_val}
+    return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
 
 #####  Compute CSI metrics  #####
@@ -216,8 +222,9 @@ def compute_csi_numerical(
 
     # get overall PSI
     csi_total = np.round(sum(csi_df["CSI"]), 3)
-
-    return {"csi_value": csi_total}
+    alert = detect_alert.alert(csi_total , "CSI", "numerical", "covariate_drift", ge)
+    
+    return {"csi_value": csi_total, "alert": alert}
 
 
 def compute_csi_categorical(
@@ -272,8 +279,9 @@ def compute_csi_categorical(
 
     # get overall PSI
     csi_total = np.round(sum(csi_df["CSI"]), 3)
+    alert = detect_alert.alert(csi_total , "CSI", "categorical", "covariate_drift", ge)
 
-    return {"csi_value": csi_total}
+    return {"csi_value": csi_total, "alert": alert}
 
 
 #####  Utils functions  #####
