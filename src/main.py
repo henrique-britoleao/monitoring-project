@@ -76,7 +76,7 @@ def process_batch(batch_id):
     
     logger.info(f'Done creating records for batch {batch_id}')
 
-    u.append_to_json({batch_name: records}, cst.MONITORING_METRICS_FILE_PATH)
+    u.append_to_json(records, cst.MONITORING_METRICS_FILE_PATH)
     
 
 def evaluate_batch(batch_id): # TODO: add possibility to specify batch
@@ -118,3 +118,13 @@ def save_preprocessed_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
 
 if __name__ == "__main__":
     main(1, 'process')
+    
+    
+def retrain_model():
+    # get batch data
+    # get sample data
+    # retain model
+    # save model
+    # erase logs
+    
+    pass
