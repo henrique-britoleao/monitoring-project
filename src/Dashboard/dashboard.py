@@ -1,15 +1,25 @@
 # import libraries 
 import os
+import sys
 import pandas as pd
 import plotly
 import streamlit as st
 import plotly.express as px
 import datetime
 
+sys.path.insert(0, "..")
+
+from Loading import loading
+from Dashboard import categorical_cov_plots
+from Dashboard import numerical_cov_plots
+from Dashboard import concept_plots
+from Dashboard import numerical_cov_plots
+import constants as cst
+
 class DashboardApp:
-    def __init__(self, sample_df, batch_dfs):
+    def __init__(self, sample_df, batch_df):
         self.sample_df = sample_df 
-        self.batch_dfs = batch_dfs
+        self.batch_df = batch_df
         
         # to be created 
         self.option = None
@@ -30,7 +40,7 @@ class DashboardApp:
 
         # create sidebar
         st.sidebar.title("Model Monitoring")
-        option = st.sidebar.selectbox('Pick Dashboard:', ('Monitoring - Overview', 'Categorical Columns', 'Numerical Columns'))
+        option = st.sidebar.selectbox('Pick Dashboard:', ('Monitoring - Overview', 'Feature Distribution Analysis'))
 
         self.option = option
 
@@ -59,10 +69,24 @@ class DashboardApp:
             # Placeholder: Raised alerts 
 
         # Categorical Columns
-        if self.option == 'Categorical Columns':
-            # placeholder: viz distribution categorical columns (sample vs batch)
+        if self.option == 'Feature Distribution Analysis':
+            st.subheader('Column Alerts')
+            st.write('Add column x metrics alert matrix')
 
-        # Numerical Columns 
-        if self.option == 'Numerical Columns':
-            # placeholder: viz distribution numerical columns (sample vs batch), cumulative distribution, mean diff etc 
+            st.subheader('Categorical Columns')
+            fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots()
+            st.plotly_chart(fig_categorical_dist)
+            st.plotly_chart(fig_categorical_dist_diff)
 
+            st.subheader('Numerical Columns')
+            fig_numerical_dist = self.create_numerical_distribution_plots()
+            st.plotly_chart(fig_numerical_dist)
+
+    def create_categorical_distribution_plots(self, categorical_col="Education"):
+        fig_categorical_dist = categorical_cov_plots.graph_categorical_dist(self.sample_df, self.batch_df, categorical_col)
+        fig_categorical_dist_diff = categorical_cov_plots.graph_categorical_dist_diff(self.sample_df, self.batch_df, categorical_col) 
+        return fig_categorical_dist, fig_categorical_dist_diff
+
+    def create_numerical_distribution_plots(self, numerical_col="Income"):
+        fig_numerical_dist = numerical_cov_plots.plot_distributions_numerical_variables(self.sample_df, self.batch_df, numerical_col)
+        return fig_numerical_dist
