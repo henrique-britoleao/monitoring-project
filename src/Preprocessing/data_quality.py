@@ -7,7 +7,7 @@ import pandas as pd
 #####  Set logger  #####
 logger = logging.getLogger(__name__)
 
-def check_data_quality(sample_df: pd.DataFrame, batch_df: pd.DataFrame):
+def check_data_quality(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> dict[str, bool]:
     """Checks overall data quality of a new batch of data comapred to 
     the original training data
 
@@ -111,9 +111,6 @@ def checkNANs(batch_df: pd.DataFrame) -> bool:
             logger.warning(f"Column: {col} has {num_nans} NAN values ❌. "
                            "This may cause the model not to fit.")
             alert_nans = True
-            break
-        else:
-            logger.info(f"There is no NAN values in the new set ✔️")
-        break
-    
+    if alert_nans == False:
+        logger.info(f"There are no NAN values in the new set ✔️")
     return alert_nans

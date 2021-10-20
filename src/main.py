@@ -2,6 +2,8 @@
 
 ################## Importing libraries ####################
 import sys
+
+# from src.Utils.utils import load_batch
 sys.path.insert(0,"Loading/")
 sys.path.insert(0,"Preprocessing/")
 sys.path.insert(0,"Modeling/")
@@ -14,35 +16,74 @@ import loading
 import preprocessing
 import modeling
 import utils as u
-import monitoring  
+import monitoring
+import data_quality  
+import train_model
 
 import constants as cst
-import logging, json
+import logging, json, pickle
+from datetime import datetime as dt
+import os
 
 import pandas as pd
 
+logging.basicConfig(filename = cst.LOG_FILE_PATH,
+                    filemode = "w",
+                    level = logging.INFO)
+
 logger = logging.getLogger(__name__)
 
-def main():
-    conf = cst.conf
+def main(batch_id):
+    batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
+    batch_df = loading.read_csv_from_path(os.path.join(cst.BATCHES_PATH, batch_name))
     
-    clf = u.load_model(conf)
-    preprocessor = preprocessing.MarketingPreprocessor()
+    sample_df = train_model.load_training_data()
+    sample_preprocesssed = loading.read_csv_from_path(cst.PREPROCESSED_TRAIN_FILE_PATH)
     
-    batch_df = pd.read_csv('../Inputs/Batches/batch1.csv')
-    preprocessed_batch = preprocessor(batch_df, column_types=cst.selected_dataset_information['column_types'])
+    data_quality_alerts = data_quality.check_data_quality(batch_df, sample_df)
+    batch_preprocessed = batch_preprocess(batch_df, cst.column_types, preprocessing.MarketingPreprocessor())
     
-    data = loading.read_csv_from_name(conf)
-    preprocessed_df = preprocessor(data, column_types=cst.selected_dataset_information['column_types'])
+    model = u.load_model()
+    predicted_batch = train_model.make_predictions_on_training_data(model, batch_preprocessed)
+    save_predicted_batch(predicted_batch)
     
-    monitoring_metrics = monitoring.compute_metrics(preprocessed_df, preprocessed_batch, clf, cst.selected_dataset_information['metrics_setup'])
+    predicted_sample = loading.read_csv_from_path(cst.PREDICTED_TRAIN_FILE_PATH)
     
-    # with open(cst.MONITORING_METRICS_FILE_PATH, 'r') as monitoring_file:
+    monitoring_metrics = monitoring.compute_metrics( 
+        sample_preprocesssed, 
+        batch_preprocessed, 
+        predicted_batch.loc[:, f'{cst.y_pred_proba}_{cst.y_class_labels[1]}'],
+        predicted_sample.loc[:, f'{cst.y_pred_proba}_{cst.y_class_labels[1]}'],
+        cst.selected_dataset_information['metrics_setup']
+    )
+    
+    # initialize output dict
+    records = {batch_name: dict()}
+    # populate records
+    records[batch_name]['date'] = str(dt.now())
+    records[batch_name].update({'data_quality': data_quality_alerts})
+    records[batch_name].update({'metrics': monitoring_metrics})
+    
+    
+    # with open(cst.MONITORING_METRICS_FILE_PATH, 'r') as monitoring_file:a
     #     metrics = json.load(monitoring_file)
-    metrics = list()
-    metrics.append(monitoring_metrics)
+
     with open(cst.MONITORING_METRICS_FILE_PATH, 'w') as monitoring_file:
-        json.dump(metrics, monitoring_file)
+        json.dump(records, monitoring_file)
+        
+
+def batch_preprocess(batch_df: pd.DataFrame, column_types: dict[str, list[str]], preprocessor: preprocessing.Preprocessor):
+    return preprocessor(batch_df, column_types)
+
+
+def save_predicted_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
+    """Save training data with predicted labels and corresponding probabilities
+
+    Args:
+        sample_df_preprocessed_pred (pd.DataFrame): preprocessed train data with predictions
+    """
+    loading.write_csv_from_path(sample_df_preprocessed_pred, cst.PREDICTED_BATCH_FILE_PATH)
+
 
 if __name__ == "__main__":
-    main()
+    main(1)
