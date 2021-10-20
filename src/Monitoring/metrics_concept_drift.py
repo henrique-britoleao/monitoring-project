@@ -14,16 +14,17 @@ logger = logging.getLogger(__name__)
 StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, float]]
 
 def compute_concept_drift_metrics(
-    sample_df: pd.DataFrame, batch_df: pd.DataFrame, target_col: str, 
+    sample_target: pd.Series, batch_target: pd.Series,  
     metrics_dict: dict[str, StatisticComputer]
 ) -> dict:
     metrics = dict()
     
-    sample_target, batch_target = sample_df.loc[:, target_col], batch_df.loc[:, target_col]
-    
     for metric_name, config_dict in metrics_dict.items():
+        # recover function from name
         statistic_computer = globals()[config_dict['function']]
+        # compute statistic
         statistic_value = statistic_computer(sample_target, batch_target)
+        # update metrics dict
         metrics.update({metric_name: statistic_value})
     
     return metrics

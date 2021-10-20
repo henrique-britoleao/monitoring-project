@@ -81,11 +81,11 @@ def compute_covariate_drift_metrics(
     
     dfs = [sample_df, batch_df]
     # compute metrics
-    numerical_metrics = compute_statistics(cst.numerical_cols, *dfs,
+    numerical_metrics = compute_statistics(cst.numerical_columns, *dfs,
                                            metrics_dict['numerical'])
-    categorical_metrics = compute_statistics(cst.categorical_cols, *dfs, 
+    categorical_metrics = compute_statistics(cst.categorical_columns, *dfs, 
                                              metrics_dict['categorical'])
-    binary_metrics = compute_statistics(cst.binary_cols, *dfs, 
+    binary_metrics = compute_statistics(cst.binary_columns, *dfs, 
                                         metrics_dict['binary'])
 
     # update output dict
