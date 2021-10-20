@@ -2,6 +2,7 @@
 
 #####  Imports  #####
 import logging
+from typing import Tuple
 logger = logging.getLogger(__name__)
 
 from abc import ABC, abstractmethod
@@ -92,7 +93,7 @@ class MarketingPreprocessor(Preprocessor):
         
         return data
 
-def basic_split(df: pd.DataFrame, target_column: str, train_size: float = 0.7, seed=42):
+def basic_split(df: pd.DataFrame, target_column: str, train_size: float = 0.7, seed=42) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """Splits the dataframe in train, test sets
 
     Args:
