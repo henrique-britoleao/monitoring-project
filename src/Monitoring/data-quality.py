@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from typing import Callable, Tuple
 import logging
-
 import pandas as pd
-import numpy as np
 
 #####  Set logger  #####
-logger = logging.getLogger("main_logger")
-
+logger = logging.getLogger(__name__)
 
 def check_data_quality(sample_df: pd.DataFrame, batch_df: pd.DataFrame):
     """Checks overall data quality of a new batch of data comapred to 
@@ -18,9 +14,23 @@ def check_data_quality(sample_df: pd.DataFrame, batch_df: pd.DataFrame):
     Args:
         batch_data (pd.DataFrame): new dataframe used to make predictions
     """
-    check_dtypes(sample_df, batch_df)
-    checkNANs(batch_df)
+    try:
+        alert_schema = check_schema(sample_df, batch_df)
+        alert_nans = checkNANs(batch_df)
+        
+        return {"alert_schema": alert_schema,
+                "alert_nans": alert_nans}
+    
+    except TypeError:
+        alert_nans = checkNANs(batch_df)
+        return {"alert_schema": 1,
+                "alert_nans": alert_nans}
 
+
+def check_schema(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
+    """TODO"""
+    return (check_dtypes(sample_df, batch_df) or 
+            check_colnames(sample_df, batch_df))
 
 def check_dtypes(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
     """Checks if the data types of the new batch of data are identical
@@ -34,34 +44,29 @@ def check_dtypes(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
     Returns:
         bool: if the data types of the columns are identical
     """
-    same_colnames = check_colnames(sample_df, batch_df)
-    same_dtypes = True
+    alert_dtypes = False
 
-    if same_colnames == True:
-        if sample_df.dtypes.equals(batch_df.dtypes):
-            logger.info(
-                f"Data types are identical in the train set and the new batch ✔️"
-            )
-        else:
-            same_dtypes = False
-            diff_df = (
-                pd.concat([df1.dtypes, df3.dtypes])
-                .drop_duplicates(keep=False)
-                .reset_index()  # find differences in dtypes
-            )
-            diff_df.columns = ["colname", "dtype"]
-            for name in diff_df.colname.unique():
-                colname = name
-                dtype_train = diff_df.loc[diff_df.colname == name].iloc[0, 1]
-                dtype_batch = diff_df.loc[diff_df.colname == name].iloc[1, 1]
-                logger.critical(
-                    f'Column "{colname}" has dtype "{dtype_train}" in the train set '
-                    f'whereas it has dtype "{dtype_batch}" in the new batch.❌'
-                )
-        return same_dtypes
-
+    if sample_df.dtypes.equals(batch_df.dtypes):
+        logger.info(
+            f"Data types are identical in the train set and the new batch ✔️"
+        )
     else:
-        return None
+        alert_dtypes = True
+        diff_df = (
+            pd.concat([sample_df.dtypes, batch_df.dtypes])
+            .drop_duplicates(keep=False)
+            .reset_index()  # find differences in dtypes
+        )
+        diff_df.columns = ["colname", "dtype"]
+        for name in diff_df.colname.unique():
+            colname = name
+            dtype_train = diff_df.loc[diff_df.colname == name].iloc[0, 1]
+            dtype_batch = diff_df.loc[diff_df.colname == name].iloc[1, 1]
+            logger.error(
+                f'Column "{colname}" has dtype "{dtype_train}" in the train set '
+                f'whereas it has dtype "{dtype_batch}" in the new batch.❌'
+            )
+    return alert_dtypes
 
 
 def check_colnames(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
@@ -75,20 +80,21 @@ def check_colnames(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> bool:
     Returns:
         bool: if the names of the columns are identical
     """
-    same_colnames = True
+    alert_colnames = False
 
     if sample_df.columns.equals(batch_df.columns):
         logger.info(
             f"Columns names are identical in the train set and the new batch ✔️"
         )
     else:
-        same_colnames = False
+        alert_colnames = True
         for i, name in enumerate(sample_df.columns.tolist()):
             batch_name = batch_df.columns.tolist()[i]
             if batch_name != name:
-                logger.critical(f'Column "{name}" became "{batch_name}"❌')
+                message = f'Column "{name}" became "{batch_name}"❌'
+                logger.error(message)
 
-    return same_colnames
+    return alert_colnames
 
 
 def checkNANs(batch_df: pd.DataFrame) -> bool:
@@ -98,11 +104,16 @@ def checkNANs(batch_df: pd.DataFrame) -> bool:
     Args:
         batch_data (pd.DataFrame): new dataframe used to make predictions
     """
+    alert_nans = False
     for col in batch_df:
         num_nans = batch_df[col].isnull().sum()
         if num_nans != 0:
-            logger(f"Column: {col} has {num_nans} NAN values ❌")
+            logger.warning(f"Column: {col} has {num_nans} NAN values ❌. "
+                           "This may cause the model not to fit.")
+            alert_nans = True
             break
         else:
             logger.info(f"There is no NAN values in the new set ✔️")
         break
+    
+    return alert_nans
