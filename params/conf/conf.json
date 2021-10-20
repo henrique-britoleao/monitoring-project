@@ -1,8 +1,9 @@
 {
 	"paths": {
-		"Inputs_path": "../Inputs/",
-		"Outputs_path": "../Outputs/",
+		"Inputs_path": "Inputs/",
+		"Outputs_path": "Outputs/",
 		"folder_preprocessed": "Preprocessed/",
+		"folder_predicted": "Predicted/",
 		"folder_models": "Models/",
 		"folder_metrics": "Metrics/",
 		"folder_monitoring": "Monitoring/"
@@ -48,6 +49,7 @@
 			"path_file": "marketing_data.csv",
 			"path_file_preprocessed": "marketing_preprocessed.csv",
 			"y_name": "Response",
+			"y_labels": ["No Response", "Response"],
 			"column_nature": {
 				"categorical_columns": [
 					"Education",
