@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
-import plot_utils as pu
+from Dashboard import plot_utils as pu
 
 ### CATEGORICAL VARIABLES ###
 def graph_categorical_dist(    

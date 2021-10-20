@@ -7,10 +7,10 @@ from scipy import stats
 import numpy as np
 import plotly.express as px
 
-import plot_utils as pu
+from Dashboard import plot_utils as pu
 
 ### NUMERICAL VARIABLES ###
-def plot_distributions_numerical_variables(numerical_col, sample_df, batch_df):
+def plot_distributions_numerical_variables(sample_df, batch_df, numerical_col):
     optim_n_bins = find_optimal_n_bins(sample_df[numerical_col])
     distrib_data = get_binned_data(sample_df[numerical_col], batch_df[numerical_col], optim_n_bins)
 
