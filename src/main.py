@@ -51,7 +51,7 @@ def process_batch(batch_id):
     sample_preprocesssed = loading.read_csv_from_path(cst.PREPROCESSED_TRAIN_FILE_PATH)
     # load model
     model = u.load_model()
-    predicted_batch = train_model.make_predictions_on_training_data(model, batch_preprocessed)
+    predicted_batch = train_model.make_predictions(model, batch_preprocessed)
     
     # load predicted sample
     predicted_sample = loading.read_csv_from_path(cst.PREDICTED_TRAIN_FILE_PATH)
@@ -117,4 +117,4 @@ def save_preprocessed_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    main(1, 'process')
+    main(1, 'evaluate')
