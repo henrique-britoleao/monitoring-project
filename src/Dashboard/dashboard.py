@@ -3,7 +3,6 @@ import os
 import sys
 import pandas as pd
 import plotly
-from src.Dashboard import model_perf_graph
 import streamlit as st
 import plotly.express as px
 import datetime
@@ -13,6 +12,7 @@ from Evaluation import feature_importance
 sys.path.insert(0, "..")
 
 from Loading import loading
+from Dashboard import model_perf_graph
 from Dashboard import concept_plots
 from Dashboard import feature_importance_plots
 from Dashboard import categorical_cov_plots
@@ -93,7 +93,7 @@ class DashboardApp:
             st.write('test')
             fig_feature_importance = self.create_feature_importance_plot()
             st.plotly_chart(fig_feature_importance)
-            fig_model_performance = model_perf_graph.plot_performance(batch_name=self.batch_name, batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH, train_perf_path=cst.TRAINING_METRICS_FILE_PATH)
+            fig_model_performance = model_perf_graph.plot_performance(batch_name=self.batch_name[:-4], batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH, train_perf_path=cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH )
             st.plotly_chart(fig_model_performance)
 
         # Feature Distribution Analysis

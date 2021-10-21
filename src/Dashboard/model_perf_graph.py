@@ -6,7 +6,7 @@ import pandas as pd
 
 def plot_performance(
     batch_perf_path: str = cst.PERFORMANCE_METRICS_FILE_PATH,
-    train_perf_path: str = cst.TRAINING_METRICS_FILE_PATH,
+    train_perf_path: str = cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH ,
     batch_name: str = "batch1",
 ):
     """Creates barplot to compare training performance vs batch performance
