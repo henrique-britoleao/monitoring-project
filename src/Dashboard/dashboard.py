@@ -7,21 +7,21 @@ import streamlit as st
 import plotly.express as px
 import datetime
 
+from Evaluation import feature_importance
+
 sys.path.insert(0, "..")
 
 from Loading import loading
+from Dashboard import concept_plots
+from Dashboard import feature_importance_plots
 from Dashboard import categorical_cov_plots
 from Dashboard import numerical_cov_plots
-from Dashboard import concept_plots
 from Dashboard import numerical_cov_plots
+from Dashboard import alert_plots
 from Dashboard import show_logs
-from Dashboard import plot_graph
 from Preprocessing import preprocessing
 from main import main
 import constants as cst
-
-def batch_preprocess(batch_df: pd.DataFrame, column_types, preprocessor: preprocessing.Preprocessor):
-    return preprocessor(batch_df, column_types)
 
 class DashboardApp:
     def __init__(self, sample_df):
@@ -29,7 +29,7 @@ class DashboardApp:
         self.batch_df = None
         self.batch_name = None
         self.batch_id = 1
-        # to be created 
+        #TODO
         self.option = None
     
     def configure_page(self):
@@ -48,7 +48,7 @@ class DashboardApp:
 
         # create sidebar
         st.sidebar.title("Model Monitoring")
-        option = st.sidebar.selectbox('Pick Dashboard:', ('Monitoring - Overview', 'Feature Distribution Analysis'))
+        option = st.sidebar.selectbox('Pick Dashboard:', ('Monitoring - Overview', 'Model Performance Analysis', 'Feature Distribution Analysis'))
         self.option = option
         uploaded_file = st.sidebar.file_uploader("Choose a file")
         if uploaded_file is not None:
@@ -65,48 +65,74 @@ class DashboardApp:
         '''
         # Main Dashboard
         if self.option == 'Monitoring - Overview' and self.batch_df is not None:
-            st.title("Monitoring Overview")
+                    st.title("Monitoring Overview")
 
-            st.subheader('Project Data')
-            st.dataframe(self.sample_df.head(5))
-            # Placeholder: Response Distribution
+                    st.subheader('Project Data')
+                    st.dataframe(self.sample_df.head(5))
+                    # Placeholder: Response Distribution
 
-            st.subheader('Model Performance Evaluation')
-            st.markdown("Evaluating the performance of our classification model over time.")
-            # Placeholder: ROC/AUC Curve, Main classification metrics (training vs batch x, y, z)
+                    st.subheader('Model Performance Evaluation')
+                    st.markdown("Evaluating the performance of our classification model over time.")
+                    # Placeholder: ROC/AUC Curve, Main classification metrics (training vs batch x, y, z)
 
-            st.subheader('Streaming Data Evolution')
-            st.markdown("Identifying potential concept drift. ")
-            with show_logs.st_stderr("code"):
-                main(self.batch_id)
-                graph = plot_graph.alerts_graph(self.batch_name, self.batch_id)
-                st.graphviz_chart(graph)
+                    st.subheader('Streaming Data Evolution')
+                    st.markdown("Identifying potential concept drift. ")
+                    with show_logs.st_stderr("code"):
+                        main(self.batch_id-1)
+                        graph = alert_plots.alerts_graph(self.batch_name, self.batch_id-2)
+                        st.graphviz_chart(graph)
 
 
-            # Placeholder: Data description (initial vs batch).
-            # Placeholder: Raised alerts 
+                    # Placeholder: Data description (initial vs batch).
+                    # Placeholder: Raised alerts 
 
-        # Categorical Columns
+        # Model Performance Analysis
+        if self.option=='Model Performance Analysis' and self.batch_df is not None:
+            st.subheader(f'Feature importance for selected model {cst.selected_model}')
+            st.write('test')
+            fig_feature_importance = self.create_feature_importance_plot()
+            st.plotly_chart(fig_feature_importance)
+
+        # Feature Distribution Analysis
         if self.option == 'Feature Distribution Analysis' and self.batch_df is not None:
-            st.dataframe(self.sample_df.head(5))
-            st.dataframe(self.batch_df.head(5))
+            st.title('Feature Distribution Analysis')
             st.subheader('Column Alerts')
-            st.write('Add column x metrics alert matrix')
-
-            st.subheader('Categorical Columns')
-            fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots()
-            st.plotly_chart(fig_categorical_dist)
-            st.plotly_chart(fig_categorical_dist_diff)
+            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, self.batch_id-2)
+            st.plotly_chart(fig_heatmap)
 
             st.subheader('Numerical Columns')
-            fig_numerical_dist = self.create_numerical_distribution_plots()
+            fig_numerical_scaled_means = self.create_numerical_distribution_plots_all_cols()
+            st.plotly_chart(fig_numerical_scaled_means)
+
+            numerical_column = st.selectbox('Select numerical column to deep dive', cst.numerical_columns)
+            fig_numerical_boxplot, fig_numerical_dist = self.create_numerical_distribution_plots(numerical_column)
+            st.plotly_chart(fig_numerical_boxplot)
             st.plotly_chart(fig_numerical_dist)
+
+            st.subheader('Categorical Columns')
+            categorical_column = st.selectbox('Select categorical column', cst.categorical_columns)
+            fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots(categorical_column)
+            st.plotly_chart(fig_categorical_dist)
+            st.plotly_chart(fig_categorical_dist_diff)
 
     def create_categorical_distribution_plots(self, categorical_col="Education"):
         fig_categorical_dist = categorical_cov_plots.graph_categorical_dist(self.sample_df, self.batch_df, categorical_col)
         fig_categorical_dist_diff = categorical_cov_plots.graph_categorical_dist_diff(self.sample_df, self.batch_df, categorical_col) 
         return fig_categorical_dist, fig_categorical_dist_diff
 
+    def create_numerical_distribution_plots_all_cols(self):
+        fig_numerical_scaled_means = numerical_cov_plots.plot_scaled_means(self.sample_df, self.batch_df)
+        return fig_numerical_scaled_means
+
     def create_numerical_distribution_plots(self, numerical_col="Income"):
+        fig_numerical_boxplot = numerical_cov_plots.plot_quartiles_numerical_variables(self.sample_df, self.batch_df, numerical_col)
         fig_numerical_dist = numerical_cov_plots.plot_distributions_numerical_variables(self.sample_df, self.batch_df, numerical_col)
-        return fig_numerical_dist
+        return fig_numerical_boxplot, fig_numerical_dist
+
+    def create_feature_importance_plot(self):
+        fig_feature_importance = feature_importance_plots.graph_feature_importance(self.sample_df)
+        return fig_feature_importance
+        pass
+
+def batch_preprocess(batch_df: pd.DataFrame, column_types, preprocessor: preprocessing.Preprocessor):
+    return preprocessor(batch_df, column_types)

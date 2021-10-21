@@ -8,9 +8,6 @@ import logging
 import time
 import pandas as pd
 
-'''sample_df = pd.read_csv("data\marketing_data_2.csv", sep=";")
-batch_df = sample_df.sample(250)'''
-
 @contextmanager
 def st_redirect(src, dst):
     placeholder = st.empty()

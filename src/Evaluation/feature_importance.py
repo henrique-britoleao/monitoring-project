@@ -22,8 +22,9 @@ def extract_feature_importance(clf: ClassifierMixin, X_train: pd.DataFrame, y_tr
     Returns: Dict of feature importance values
     """
     clf2 = clone(clf)
+    clf2.fit(X_train, y_train)
     importances = permutation_importance(clf2, X_train, y_train,
-                            n_repeats=10,
+                            n_repeats=5,
                            random_state=42)
 
     importances_df = pd.DataFrame(

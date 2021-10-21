@@ -65,15 +65,11 @@ def make_predictions(model, sample_df_preprocessed: pd.DataFrame) -> pd.DataFram
     """
     sample_df_preprocessed_pred = sample_df_preprocessed.copy()
     
-    # drop target column
-    if cst.y_name in sample_df_preprocessed_pred.columns:
-        sample_df_preprocessed_pred = sample_df_preprocessed_pred.drop(cst.y_name, axis=1)
-        
-    sample_df_preprocessed_pred[cst.y_pred] = model.predict(sample_df_preprocessed_pred)
+    sample_df_preprocessed_pred[cst.y_pred] = model.predict(sample_df_preprocessed_pred.drop(cst.y_name, axis=1))
     sample_df_preprocessed_pred[
         [f"{cst.y_pred_proba}_{cst.y_class_labels[0]}", 
          f"{cst.y_pred_proba}_{cst.y_class_labels[1]}"]
-    ] = model.predict_proba(sample_df_preprocessed_pred.drop([cst.y_pred], axis=1))
+    ] = model.predict_proba(sample_df_preprocessed_pred.drop([cst.y_name, cst.y_pred], axis=1))
 
     return sample_df_preprocessed_pred
 
