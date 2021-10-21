@@ -56,6 +56,7 @@ class DashboardApp:
                 "Monitoring - Overview",
                 "Model Performance Analysis",
                 "Feature Distribution Analysis",
+                "Concept Drift Analysis",
             ),
         )
         self.option = option
@@ -146,6 +147,15 @@ class DashboardApp:
             ) = self.create_categorical_distribution_plots(categorical_column)
             st.plotly_chart(fig_categorical_dist)
             st.plotly_chart(fig_categorical_dist_diff)
+
+        # Concept Drift Analysis
+        if self.option == "Concept Drift Analysis" and self.batch_df is not None:
+            st.subheader(f"Drift in predictions when using {cst.selected_model}")
+            st.write("Change in distribution of target probability predictions")
+            fig_cov_drift = concept_plots.graph_target_prob_dist(
+                cst.PREDICTED_TRAIN_FILE_PATH, cst.PREDICTED_TRAIN_FILE_PATH
+            )
+            st.plotly_chart(fig_cov_drift)
 
     def create_categorical_distribution_plots(self, categorical_col="Education"):
         fig_categorical_dist = categorical_cov_plots.graph_categorical_dist(
