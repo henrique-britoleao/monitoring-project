@@ -74,17 +74,12 @@ def get_y_column_from_conf():
     return cst.y_name
 
 def save_training_performance_metrics(metrics: dict): #conf: dict) -> None:
-    """
-    Saves the dictionary containing model performance metrics to a json file
-
-    Args:
-        metrics (dict): Dict of classification performance metrics
-        conf (dict): Configuration file stored as a json object
-    """
-    # with open(conf['paths']['Outputs_path'] + conf['paths']['folder_metrics'] + 'training_metrics_'
-    #         + conf['selected_dataset'] + "_" + conf['selected_model'] + '.txt', 'w') as outfile:
-    #     json.dump(str(metrics), outfile)
-    pass
+    """TODO"""
+    file_path = cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH
+    with open(file_path, 'w') as f:
+        content = json.dump(metrics, f)
+        
+    logger.info(f"Wrote performance metrics to: {file_path}")
         
 def load_batch(batch_id: str) -> pd.DataFrame:
     batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
@@ -96,7 +91,7 @@ def append_to_json(data: dict, file_path: str) -> None:
     try:
         with open(file_path, 'r') as f:
             content = json.load(f)
-    except json.decoder.JSONDecodeError:
+    except (json.decoder.JSONDecodeError, FileNotFoundError):
         content = []
     
     content.append(data)
