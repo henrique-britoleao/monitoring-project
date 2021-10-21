@@ -7,10 +7,68 @@ from scipy import stats
 import numpy as np
 import plotly.express as px
 
+from sklearn.preprocessing import MinMaxScaler
+
+import constants as cst
+
 from Dashboard import plot_utils as pu
 
 ### NUMERICAL VARIABLES ###
-def plot_distributions_numerical_variables(sample_df, batch_df, numerical_col):
+def plot_scaled_means(sample_df, batch_df, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):
+    scaler = MinMaxScaler()
+    scaled_sample_df, scaled_batch_df = sample_df.loc[:, cst.numerical_columns], batch_df.loc[:, cst.numerical_columns]
+
+    scaled_sample_df.loc[:, cst.numerical_columns] = scaler.fit_transform(scaled_sample_df.loc[:, cst.numerical_columns])
+    scaled_batch_df.loc[:, cst.numerical_columns] = scaler.transform(scaled_batch_df.loc[:, cst.numerical_columns])
+
+    sample_means = pd.DataFrame(
+        data={
+            "Source": "Sample",
+            "Numerical Column": scaled_sample_df.mean().index, 
+            "Scaled Mean": scaled_sample_df.mean().values
+        }
+    )
+
+    batch_means = pd.DataFrame(
+        data={
+            "Source": "Batch",
+            "Numerical Column": scaled_batch_df.mean().index, 
+            "Scaled Mean": scaled_batch_df.mean().values
+        }
+    )
+    data = pd.concat([sample_means, batch_means])
+
+    fig = px.bar(
+        data, 
+        x='Numerical Column', 
+        y='Scaled Mean', 
+        text=[f"{np.round(m, 2)}" for m in data['Scaled Mean']],
+        color='Source', 
+        barmode='group', 
+        color_discrete_sequence=colors
+    )
+
+    pu.update_fig_centered_title(fig, "Sample vs Batch Scaled Means for numerical features")
+    
+    return fig
+
+def plot_quartiles_numerical_variables(sample_df, batch_df, numerical_col, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):
+    sample_data = pd.DataFrame(data={'source': 'Sample', numerical_col: sample_df[numerical_col]})
+    batch_data = pd.DataFrame(data={'source': 'Batch', numerical_col: batch_df[numerical_col]})
+    data = pd.concat([sample_data, batch_data])
+
+    fig = px.box(data, x="source", y=numerical_col, color="source", color_discrete_sequence=colors)
+    fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
+    fig.update_layout(
+        xaxis_title="Dataset", 
+        yaxis_title=numerical_col
+        )
+
+    pu.update_fig_centered_title(fig, f"Sample vs Batch Distribution in column {numerical_col}")
+ 
+    return fig
+
+def plot_distributions_numerical_variables(sample_df, batch_df, numerical_col, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):
     optim_n_bins = find_optimal_n_bins(sample_df[numerical_col])
     distrib_data = get_binned_data(sample_df[numerical_col], batch_df[numerical_col], optim_n_bins)
 
@@ -27,7 +85,8 @@ def plot_distributions_numerical_variables(sample_df, batch_df, numerical_col):
         x="bin_upper_bound", 
         y="proportion", 
         color="source", 
-        barmode="overlay"
+        barmode="overlay",
+        color_discrete_sequence=colors
     )
 
     pu.update_fig_centered_title(fig, f"Sample vs Batch Distribution in column {numerical_col}")
