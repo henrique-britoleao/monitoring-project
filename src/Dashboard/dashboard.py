@@ -104,14 +104,14 @@ class DashboardApp:
             fig_numerical_scaled_means = self.create_numerical_distribution_plots_all_cols()
             st.plotly_chart(fig_numerical_scaled_means)
 
-            #TODO: selector for numerical columns + add numerical_col argument in create...
-            fig_numerical_boxplot, fig_numerical_dist = self.create_numerical_distribution_plots()
+            numerical_column = st.selectbox('Select numerical column to deep dive', cst.numerical_columns)
+            fig_numerical_boxplot, fig_numerical_dist = self.create_numerical_distribution_plots(numerical_column)
             st.plotly_chart(fig_numerical_boxplot)
             st.plotly_chart(fig_numerical_dist)
 
-            #TODO: selector for categorical columns + add categorical_col argument in create...
             st.subheader('Categorical Columns')
-            fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots()
+            categorical_column = st.selectbox('Select categorical column', cst.categorical_columns)
+            fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots(categorical_column)
             st.plotly_chart(fig_categorical_dist)
             st.plotly_chart(fig_categorical_dist_diff)
 
