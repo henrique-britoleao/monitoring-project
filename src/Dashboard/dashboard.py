@@ -3,6 +3,7 @@ import os
 import sys
 import pandas as pd
 import plotly
+from src.Dashboard import model_perf_graph
 import streamlit as st
 import plotly.express as px
 import datetime
@@ -92,6 +93,8 @@ class DashboardApp:
             st.write('test')
             fig_feature_importance = self.create_feature_importance_plot()
             st.plotly_chart(fig_feature_importance)
+            fig_model_performance = model_perf_graph.plot_performance(batch_name=self.batch_name, batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH, train_perf_path=cst.TRAINING_METRICS_FILE_PATH)
+            st.plotly_chart(fig_model_performance)
 
         # Feature Distribution Analysis
         if self.option == 'Feature Distribution Analysis' and self.batch_df is not None:
