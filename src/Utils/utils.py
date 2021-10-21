@@ -63,7 +63,7 @@ def load_model(name=""):
         name = f"{cst.selected_dataset}_{cst.selected_model}"
     filename = cst.MODELS_PATH + name + ".sav"
     
-    with open(filename, 'wb') as model_file:
+    with open(filename, 'rb') as model_file:
         clf = pickle.load(model_file)
         logger.info('Loaded model: ' + filename)
     
