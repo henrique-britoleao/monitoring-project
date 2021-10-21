@@ -78,8 +78,8 @@ class DashboardApp:
                     st.subheader('Streaming Data Evolution')
                     st.markdown("Identifying potential concept drift. ")
                     with show_logs.st_stderr("code"):
-                        main(self.batch_id)
-                        graph = alert_plots.alerts_graph(self.batch_name, self.batch_id)
+                        main(self.batch_id-1)
+                        graph = alert_plots.alerts_graph(self.batch_name, self.batch_id-2)
                         st.graphviz_chart(graph)
 
 
@@ -98,7 +98,8 @@ class DashboardApp:
         if self.option == 'Feature Distribution Analysis' and self.batch_df is not None:
             st.title('Feature Distribution Analysis')
             st.subheader('Column Alerts')
-            st.write('Add column x metrics alert matrix')
+            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, self.batch_id-2)
+            st.plotly_chart(fig_heatmap)
 
             st.subheader('Categorical Columns')
             if self.sample_df is not None:
