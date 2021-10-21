@@ -4,6 +4,7 @@ import logging
 import pickle
 import json
 import os
+import io
 
 import constants as cst
 
@@ -50,16 +51,24 @@ def save_model(clf, name=""):
     if len(name)==0:
         name = f"{cst.selected_dataset}_{cst.selected_model}"
     filename = cst.MODELS_PATH + name + ".sav"
-    pickle.dump(clf, open(filename, 'wb'))
+    
+    with open(filename, 'wb') as model_file:
+        pickle.dump(clf, model_file)
+
     logger.info('Saved model: ' + filename)
+    
 
 def load_model(name=""):
     if len(name)==0:
         name = f"{cst.selected_dataset}_{cst.selected_model}"
     filename = cst.MODELS_PATH + name + ".sav"
-    clf = pickle.load(open(filename, 'rb'))
-    logger.info('Loaded model: ' + filename)
+    
+    with open(filename, 'rb') as model_file:
+        clf = pickle.load(model_file)
+        logger.info('Loaded model: ' + filename)
+    
     return clf
+
 
 def get_y_column_from_conf():
     return cst.y_name
@@ -82,3 +91,17 @@ def load_batch(batch_id: str) -> pd.DataFrame:
     batch_path = os.path.join(cst.BATCHES_PATH, batch_name)
     
     return pd.read_csv(batch_path)
+
+def append_to_json(data: dict, file_path: str) -> None:
+    try:
+        with open(file_path, 'r') as f:
+            content = json.load(f)
+    except json.decoder.JSONDecodeError:
+        content = []
+    
+    content.append(data)
+    
+    with open(file_path, 'w') as f:
+        content = json.dump(content, f)
+        
+    logger.info(f"Appended data to {file_path}")

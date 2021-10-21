@@ -31,3 +31,13 @@ def write_csv_from_path(df: pd.DataFrame, path: Path):
     """
     df.to_csv(path, sep=";", index=False)
     logger.debug('Wrote file in: '+ path)
+    
+def load_training_data() -> pd.DataFrame:
+    """Load training data
+
+    Returns:
+        pd.DataFrame: raw training data
+    """
+    logger.info("Load training data")
+    sample_df = read_csv_from_path(cst.RAW_TRAIN_FILE_PATH)
+    return sample_df 

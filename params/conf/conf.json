@@ -7,9 +7,10 @@
 		"folder_predicted": "Predicted/",
 		"folder_models": "Models/",
 		"folder_metrics": "Metrics/",
-		"folder_monitoring": "Monitoring/"
+		"folder_monitoring": "Monitoring/",
+		"main_logger": "../params/logs/main_logs.log",
+		"training_logger": "../params/logs/training_logs.log"
 	},
-	"path_log": "../params/logs/logs.log",
 	"log_level": "INFO",
 	"__comments_on_selections__": "You can choose the dataset of your choice and the model you want with the 2 following parameters",
 	"selected_dataset": "marketing",
@@ -54,6 +55,7 @@
 				"No Response",
 				"Response"
 			],
+			"preprocessor": "MarketingPreprocessor",
 			"column_nature": {
 				"categorical_columns": [
 					"Education",

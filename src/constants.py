@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
+import sys
+sys.path.insert(0, 'Preprocessing/')
+
+from preprocessing import * # needed to recover preprocessor 
+
 import json, os
 from string import Template
 
+#####  Constants definitions  #####
 # load configurations
 PATH_CONF = "../params/conf/conf.json"
-# PATH_CONF = "params/conf/conf.json"
 conf = json.load(open(PATH_CONF, 'r'))
 
 selected_dataset = conf["selected_dataset"]
@@ -44,7 +49,7 @@ PREPROCESSED_TRAIN_FILE_NAME = "sample_df_preprocessed.csv"
 PREPROCESSED_TRAIN_FILE_PATH = os.path.join(PREPROCESSED_PATH, PREPROCESSED_TRAIN_FILE_NAME)
 
 PREDICTED_TRAIN_FILE_NAME = "sample_df_predicted.csv"
-PREDICTED_TRAIN_FILE_PATH = os.path.join(PREPROCESSED_PATH, PREPROCESSED_TRAIN_FILE_NAME)
+PREDICTED_TRAIN_FILE_PATH = os.path.join(PREDICTED_PATH, PREDICTED_TRAIN_FILE_NAME)
 
 PREPROCESSED_BATCH_FILE_NAME = "batch_df_preprocessed.csv"
 PREPROCESSED_BATCH_FILE_PATH = os.path.join(PREPROCESSED_PATH, PREPROCESSED_BATCH_FILE_NAME)
@@ -58,6 +63,14 @@ TRAINING_METRICS_FILE_PATH = os.path.join(METRICS_PATH, TRAINING_METRICS_FILE_NA
 MONITORING_METRICS_FILE_NAME = "metrics.json"
 MONITORING_METRICS_FILE_PATH = os.path.join(MONITORING_PATH, MONITORING_METRICS_FILE_NAME)
 
-LOG_FILE_PATH = conf["path_log"]
+PERFORMANCE_METRICS_FILE_NAME = "performance.json"
+PERFORMANCE_METRICS_FILE_PATH = os.path.join(MONITORING_PATH, PERFORMANCE_METRICS_FILE_NAME)
+
+
+MAIN_LOG_FILE_PATH = conf["paths"]["main_logger"]
+TRAINING_LOG_FILE_PATH = conf["paths"]["training_logger"]
 
 BATCH_NAME_TEMPLATE = Template('batch${id}.csv')
+
+# recover preprocessor
+PREPROCESSOR = globals()[selected_dataset_information["preprocessor"]]()
