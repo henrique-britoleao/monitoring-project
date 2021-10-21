@@ -41,7 +41,7 @@ def process_batch(batch_id):
     batch_df = loading.read_csv_from_path(os.path.join(cst.BATCHES_PATH, batch_name))
     
     # check quality of batch
-    sample_df = train_model.load_training_data()
+    sample_df = loading.load_training_data()
     data_quality_alerts = data_quality.check_data_quality(batch_df, sample_df)
     # preprocess batch data
     batch_preprocessed = batch_preprocess(batch_df, cst.column_types, preprocessing.MarketingPreprocessor())
