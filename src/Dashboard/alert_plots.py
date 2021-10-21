@@ -1,4 +1,4 @@
-#import libraries
+# import libraries
 import os
 import sys
 import json
@@ -36,7 +36,7 @@ def high_level_alert(batch_name: str, batch_id: str) -> list:
     data_quality = max(dict_metrics[batch_id][batch_name]['data_quality'].values())
     outliers = dict_metrics[batch_id][batch_name]['outliers']['alert']
     concept_drift = dict_metrics[batch_id][batch_name]['metrics']['PSI']['alert']
-    numerical_drift = pd.DataFrame(
+    numerical_drift = pd.DataFrame( 
         dict_metrics[batch_id][batch_name]['metrics']['covariate_drift_metrics']['numerical_metrics'])\
         .applymap(lambda x: dict(x)['alert']).transpose().max().max()
     categorical_drift = pd.DataFrame(
