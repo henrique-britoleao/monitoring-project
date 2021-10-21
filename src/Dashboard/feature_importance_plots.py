@@ -29,9 +29,20 @@ def graph_feature_importance(sample_df: pd.DataFrame):
 
 def get_feature_importance_to_plot(sample_df):
     model = u.load_model()
+    X_train = sample_df.copy()
+    X_train = X_train.drop(
+        columns=[
+        cst.y_name, 
+        cst.y_pred, 
+        f"{cst.y_pred_proba}_{cst.y_class_labels[0]}", 
+        f"{cst.y_pred_proba}_{cst.y_class_labels[1]}"
+        ]
+    )
+    y_train = sample_df[cst.y_name]
+
     importances_df = feature_importance.extract_feature_importance(
         model, 
-        sample_df.drop(columns=[cst.y_name]), 
-        sample_df[cst.y_name]
+        X_train, 
+        y_train
     )
     return importances_df.sort_values('importance_score', ascending=False)
