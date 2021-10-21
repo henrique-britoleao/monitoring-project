@@ -29,7 +29,7 @@ class DashboardApp:
         self.batch_df = None
         self.batch_name = None
         self.batch_id = 1
-        # to be created 
+        #TODO
         self.option = None
     
     def configure_page(self):
@@ -78,8 +78,8 @@ class DashboardApp:
                     st.subheader('Streaming Data Evolution')
                     st.markdown("Identifying potential concept drift. ")
                     with show_logs.st_stderr("code"):
-                        main(self.batch_id)
-                        graph = alert_plots.alerts_graph(self.batch_name, self.batch_id)
+                        main(self.batch_id-1)
+                        graph = alert_plots.alerts_graph(self.batch_name, self.batch_id-2)
                         st.graphviz_chart(graph)
 
 
@@ -90,7 +90,6 @@ class DashboardApp:
         if self.option=='Model Performance Analysis' and self.batch_df is not None:
             st.subheader(f'Feature importance for selected model {cst.selected_model}')
             st.write('test')
-            #TODO
             fig_feature_importance = self.create_feature_importance_plot()
             st.plotly_chart(fig_feature_importance)
 
@@ -98,37 +97,37 @@ class DashboardApp:
         if self.option == 'Feature Distribution Analysis' and self.batch_df is not None:
             st.title('Feature Distribution Analysis')
             st.subheader('Column Alerts')
-            st.write('Add column x metrics alert matrix')
-
-            st.subheader('Categorical Columns')
-            if self.sample_df is not None:
-                fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots()
-                st.plotly_chart(fig_categorical_dist)
-                st.plotly_chart(fig_categorical_dist_diff)
-            else:
-                st.write(self.create_categorical_distribution_plots())
+            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, self.batch_id-2)
+            st.plotly_chart(fig_heatmap)
 
             st.subheader('Numerical Columns')
-            if self.sample_df is not None:
-                fig_numerical_dist = self.create_numerical_distribution_plots()
-                st.plotly_chart(fig_numerical_dist)
-            else:
-                st.write(self.create_numerical_distribution_plots())
+            fig_numerical_scaled_means = self.create_numerical_distribution_plots_all_cols()
+            st.plotly_chart(fig_numerical_scaled_means)
+
+            #TODO: selector for numerical columns + add numerical_col argument in create...
+            fig_numerical_boxplot, fig_numerical_dist = self.create_numerical_distribution_plots()
+            st.plotly_chart(fig_numerical_boxplot)
+            st.plotly_chart(fig_numerical_dist)
+
+            #TODO: selector for categorical columns + add categorical_col argument in create...
+            st.subheader('Categorical Columns')
+            fig_categorical_dist, fig_categorical_dist_diff = self.create_categorical_distribution_plots()
+            st.plotly_chart(fig_categorical_dist)
+            st.plotly_chart(fig_categorical_dist_diff)
 
     def create_categorical_distribution_plots(self, categorical_col="Education"):
-        if self.batch_id is not None:
-            fig_categorical_dist = categorical_cov_plots.graph_categorical_dist(self.sample_df, self.batch_df, categorical_col)
-            fig_categorical_dist_diff = categorical_cov_plots.graph_categorical_dist_diff(self.sample_df, self.batch_df, categorical_col) 
-            return fig_categorical_dist, fig_categorical_dist_diff
-        else:
-            return "Requires a batch dataframe to plot categorical distribution graphs."
+        fig_categorical_dist = categorical_cov_plots.graph_categorical_dist(self.sample_df, self.batch_df, categorical_col)
+        fig_categorical_dist_diff = categorical_cov_plots.graph_categorical_dist_diff(self.sample_df, self.batch_df, categorical_col) 
+        return fig_categorical_dist, fig_categorical_dist_diff
+
+    def create_numerical_distribution_plots_all_cols(self):
+        fig_numerical_scaled_means = numerical_cov_plots.plot_scaled_means(self.sample_df, self.batch_df)
+        return fig_numerical_scaled_means
 
     def create_numerical_distribution_plots(self, numerical_col="Income"):
-        if self.batch_id is not None:
-            fig_numerical_dist = numerical_cov_plots.plot_distributions_numerical_variables(self.sample_df, self.batch_df, numerical_col)
-            return fig_numerical_dist
-        else:
-            return "Requires a batch dataframe to plot numerical distribution graphs."
+        fig_numerical_boxplot = numerical_cov_plots.plot_quartiles_numerical_variables(self.sample_df, self.batch_df, numerical_col)
+        fig_numerical_dist = numerical_cov_plots.plot_distributions_numerical_variables(self.sample_df, self.batch_df, numerical_col)
+        return fig_numerical_boxplot, fig_numerical_dist
 
     def create_feature_importance_plot(self):
         fig_feature_importance = feature_importance_plots.graph_feature_importance(self.sample_df)
