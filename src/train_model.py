@@ -21,39 +21,47 @@ def main_model_training_pipeline() -> None:
     """
     sample_df = loading.load_training_data()
 
+    train_model_pipeline(data=sample_df, predictions_path=cst.PREDICTED_TRAIN_FILE_PATH)
+
+def train_model_pipeline(data: pd.DataFrame, predictions_path: str, model_name: str="") -> None:
+    """ TODO Change doc
+    Loads and preprocesses the training data, trains and saves a model with 
+    optimal hyperparameters, computes training performance metrics, make 
+    predictions on the training set and saves results.
+    """
     # Preprocess and save training data 
-    sample_df_preprocessed = cst.PREPROCESSOR(sample_df, cst.column_types)
-    save_preprocessed_training_data(sample_df_preprocessed)
+    data_preprocessed = cst.PREPROCESSOR(data, cst.column_types)
+    save_preprocessed_training_data(data_preprocessed)
 
     # Train and save model
     model, _ = modeling.main_modeling_from_name(
-        sample_df_preprocessed.drop(columns=[cst.y_name]),
-        sample_df_preprocessed[cst.y_name]
+        data_preprocessed.drop(columns=[cst.y_name]),
+        data_preprocessed[cst.y_name]
     )
-    u.save_model(model)
+    u.save_model(model, name=model_name)
 
     # Compute and save model performance metrics
     training_performance_metrics = evaluation.cross_evaluate_model_performance(
         model,
-        sample_df_preprocessed.drop(columns=[cst.y_name]),
-        sample_df_preprocessed[cst.y_name]
+        data_preprocessed.drop(columns=[cst.y_name]),
+        data_preprocessed[cst.y_name]
     )
     u.save_training_performance_metrics(training_performance_metrics)
 
     # Make predictions on the training set and save results
-    sample_df_preprocessed_pred = make_predictions_on_training_data(model, sample_df_preprocessed)
-    save_predicted_training_data(sample_df_preprocessed_pred)
+    data_preprocessed_pred = make_predictions(model, data_preprocessed)
+    loading.write_csv_from_path(data_preprocessed_pred, path=predictions_path)
 
 
-def make_predictions_on_training_data(model, sample_df_preprocessed: pd.DataFrame) -> pd.DataFrame:
-    """Add predictions to the preprocessed training dataset
+def make_predictions(model, sample_df_preprocessed: pd.DataFrame) -> pd.DataFrame:
+    """Add predictions to the preprocessed dataset
 
     Args:
         model (Pipeline): trained model
-        sample_df_preprocessed (pd.DataFrame): preprocessed training data
+        sample_df_preprocessed (pd.DataFrame): preprocessed data
 
     Returns:
-        pd.DataFrame: preprocessed training data with predicted labels and probabilities
+        pd.DataFrame: preprocessed data with predicted labels and probabilities
     """
     sample_df_preprocessed_pred = sample_df_preprocessed.copy()
     
