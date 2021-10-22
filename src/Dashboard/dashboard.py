@@ -103,16 +103,19 @@ class DashboardApp:
 
         # Model Performance Analysis
         if self.option == "Model Performance Analysis" and self.batch_df is not None:
-            st.subheader(f"Feature importance for selected model {cst.selected_model}")
-            st.write("test")
-            fig_feature_importance = self.create_feature_importance_plot()
-            st.plotly_chart(fig_feature_importance)
+            st.subheader("Model performance evolution")
+            st.write("Visualize classification performance metrics (cross-validation scores using the training data vs. true performance on the batch data:")
             fig_model_performance = model_perf_graph.plot_performance(
                 batch_name=self.batch_name[:-4],
                 batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH,
                 train_perf_path=cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH,
             )
+
             st.plotly_chart(fig_model_performance)
+            st.subheader(f"Feature importance for selected model {cst.selected_model}")
+            st.write("Visualize the relative feature importance of each feature used in the model using permutation importance:")
+            fig_feature_importance = self.create_feature_importance_plot()
+            st.plotly_chart(fig_feature_importance)
 
         # Feature Distribution Analysis
         if self.option == "Feature Distribution Analysis" and self.batch_df is not None:
