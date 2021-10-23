@@ -1,108 +1,43 @@
 # -*- coding: utf-8 -*-
 
-################## Importing libraries ####################
-import loading
-from preprocessing import preprocessing
-from preprocessing import data_quality  
-from modeling import modeling
-from monitoring import monitoring, outlier_detection
-import train_model
-from evaluation import evaluation
-from utils import utils as u
-
+#####  Imports  #####
+from monitoring import monitor_runner
 import constants as cst
-import logging, json, pickle
-from datetime import datetime as dt
-import os
 
-import pandas as pd
+import argparse
+import logging
 
+#####  Set Logger  #####
+# TODO: handle loggers better
 logging.basicConfig(filename = cst.MAIN_LOG_FILE_PATH,
                     filemode = "w",
                     level = logging.INFO)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)    
 
-def process_batch(batch_id):
-    # load batch data
-    batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
-    batch_df = loading.read_csv_from_path(os.path.join(cst.BATCHES_PATH, batch_name))
-    
-    # check quality of batch
-    sample_df = loading.load_training_data()
-    data_quality_alerts = data_quality.check_data_quality(batch_df, sample_df)
-    # preprocess batch data
-    batch_preprocessed = batch_preprocess(batch_df, cst.column_types, preprocessing.MarketingPreprocessor())
-    save_preprocessed_batch(batch_preprocessed)
-    
-    # load preprocessed sample data
-    sample_preprocesssed = loading.read_csv_from_path(cst.PREPROCESSED_TRAIN_FILE_PATH)
-    # load model
-    model = u.load_model()
-    predicted_batch = train_model.make_predictions(model, batch_preprocessed)
-    
-    # load predicted sample
-    predicted_sample = loading.read_csv_from_path(cst.PREDICTED_TRAIN_FILE_PATH)
-    # compute drift metrics
-    monitoring_metrics = monitoring.compute_metrics( 
-        sample_preprocesssed, 
-        batch_preprocessed, 
-        predicted_batch.loc[:, f'{cst.y_pred_proba}_{cst.y_class_labels[1]}'],
-        predicted_sample.loc[:, f'{cst.y_pred_proba}_{cst.y_class_labels[1]}'],
-        cst.selected_dataset_information['metrics_setup']
-    )
-    # detect outliers
-    outlier_alerts = outlier_detection.build_outlier_dict(batch_preprocessed)
-    
-    # initialize output dict
-    records = {batch_name: dict()}
-    # populate records
-    records[batch_name]['date'] = str(dt.now())
-    records[batch_name].update({'data_quality': data_quality_alerts})
-    records[batch_name].update({'metrics': monitoring_metrics})
-    records[batch_name].update({'outliers': outlier_alerts})
-    
-    logger.info(f'Done creating records for batch {batch_id}')
+#####  Main script  #####
+# Set the argument parser
+argument_parser = argparse.ArgumentParser(
+    description='Process to monitor a batch.'
+)
+argument_parser.add_argument('-m', '--mode', default='process', nargs=1, choices=['process', 'evaluate'], help='Defines the type of monitoring to perform')
+argument_parser.add_argument('--batch-id', help='Id of batch to be parsed', nargs=1, required=True)
 
-    u.append_to_json(records, cst.MONITORING_METRICS_FILE_PATH)
-    
-
-def evaluate_batch(batch_id): # TODO: add possibility to specify batch
-    # build batch name
-    batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)[:-4]
-    # load batch data
-    preprocessed_batch = loading.read_csv_from_path(cst.PREPROCESSED_BATCH_FILE_PATH)
-    # load model
-    model = u.load_model()
-    
-    X_batch = preprocessed_batch.drop(columns=cst.y_name)
-    y_batch = preprocessed_batch[cst.y_name]
-
-    performance_metrics = evaluation.evaluate_model_performance_on_test(model, X_batch, y_batch)
-        
-    u.append_to_json({batch_name: performance_metrics}, cst.PERFORMANCE_METRICS_FILE_PATH)
-    
-
+# Define main script
 def main(batch_id, mode="process"):
+    # initialize runner
+    runner = monitor_runner.MonitorRunner(batch_id)
+    
     if mode == "process":
-        process_batch(batch_id)
+        runner.process_batch(preprocessor=cst.PREPROCESSOR)
     if mode == "evaluate":
-        evaluate_batch(batch_id)
+        runner.evaluate_batch(preprocessor=cst.PREPROCESSOR)
         
 
-def batch_preprocess(batch_df: pd.DataFrame, column_types: dict[str, list[str]], preprocessor: preprocessing.Preprocessor):
-    return preprocessor(batch_df, column_types)
-
-
-def save_preprocessed_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
-    """Save training data with predicted labels and corresponding probabilities
-
-    Args:
-        sample_df_preprocessed_pred (pd.DataFrame): preprocessed train data with predictions
-    """
-    loading.write_csv_from_path(sample_df_preprocessed_pred, cst.PREPROCESSED_BATCH_FILE_PATH)
-    logger.info('Saved batch predicitons')
-
-
+def usage():
+    # TODO
+    pass
+        
 if __name__ == "__main__":
-    main(1, 'process')
+    args = argument_parser.parse_args()
+    main(*args.batch_id, *args.mode)
