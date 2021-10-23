@@ -53,7 +53,6 @@ venv.bak/
 # Files
 Inputs/*
 Outputs/*
-params/logs/*
 
 # Logs
 logs/* 
