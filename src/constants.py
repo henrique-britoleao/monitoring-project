@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-import sys
-
-# sys.path.insert(0, "Preprocessing/")
-
 from preprocessing.preprocessing import *  # needed to recover preprocessor # TODO: implement dict and not globals
 
 import json, os
@@ -12,7 +8,7 @@ from string import Template
 
 #####  Constants definitions  #####
 # load configurations
-PATH_CONF = "../params/conf/conf.json"
+PATH_CONF = "params/conf/conf.json"
 conf = json.load(open(PATH_CONF, "r"))
 
 selected_dataset = conf["selected_dataset"]

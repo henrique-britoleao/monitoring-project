@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from monitoring import monitor_runner
-import constants as cst
+from src.monitoring import monitor_runner
+import src.constants as cst
 
 import argparse
 import logging
