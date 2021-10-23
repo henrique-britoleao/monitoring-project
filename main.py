@@ -35,6 +35,7 @@ argument_parser.add_argument(
 
 # Define main script
 def main(batch_id, mode="process"):
+    """Runs monitoring on batch."""
     # initialize runner
     runner = monitor_runner.MonitorRunner(batch_id)
     
