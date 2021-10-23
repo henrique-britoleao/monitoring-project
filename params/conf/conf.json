@@ -10,9 +10,9 @@
 		"folder_monitoring": "Monitoring/",
 		"main_logger": "logs/main_logs.log",
 		"debug_logger": "logs/debug_logs.log",
-		"training_logger": "logs/training_logs.log"
+		"training_logger": "logs/training_logs.log",
+		"alert_logger": "logs/alert_logs.log"
 	},
-	"log_level": "INFO",
 	"__comments_on_selections__": "You can choose the dataset of your choice and the model you want with the 2 following parameters",
 	"selected_dataset": "marketing",
 	"selected_model": "lightgbm",

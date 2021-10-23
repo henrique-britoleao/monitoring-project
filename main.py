@@ -33,6 +33,7 @@ argument_parser.add_argument(
 # Define main script
 def main(batch_id, mode="process"):
     """Runs monitoring on batch."""
+    logger.info(f'Starting run of main. Parsing batch {batch_id} on mode {mode}')
     # initialize runner
     runner = monitor_runner.MonitorRunner(batch_id)
     preprocessor = get_preprocessor()

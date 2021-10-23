@@ -77,7 +77,7 @@ def compute_psi(
     # get overall PSI
     psi_total = np.round(sum(psi_df["PSI"]), 3)
 
-    alert = detect_alert.alert(psi_total, "PSI", "", "concept_drift", ge)
+    alert = detect_alert.alert(psi_total, "PSI", "", "concept_drift", f"Detected PSI! PSI value: {psi_total}", ge)
 
     return {"psi_value": psi_total, "alert": alert}
 

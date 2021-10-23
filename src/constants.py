@@ -83,5 +83,6 @@ TRAIN_PERFORMANCE_METRICS_FILE_PATH = os.path.join(
 MAIN_LOG_FILE_PATH = conf["paths"]["main_logger"]
 DEBUG_LOG_FILE_PATH = conf["paths"]["debug_logger"]
 TRAINING_LOG_FILE_PATH = conf["paths"]["training_logger"]
+ALERT_LOG_FILE_PATH = conf["paths"]["alert_logger"]
 
 BATCH_NAME_TEMPLATE = Template("batch${id}.csv")
