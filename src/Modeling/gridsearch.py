@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import make_scorer, f1_score
 
-from Modeling.pipeline_builder import build_prediction_pipeline
+from modeling.pipeline_builder import build_prediction_pipeline
 
 ###### GRIDSEARCH ######
 def main_GS_from_estimator_and_params(X_train: pd.DataFrame, y_train: pd.Series, estimator, params_grid: dict) -> Tuple[dict, float]:

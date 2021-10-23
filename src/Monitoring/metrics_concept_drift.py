@@ -7,7 +7,7 @@ import numpy as np
 from typing import Callable
 import logging
 
-import detect_alert
+import monitoring.detect_alert as detect_alert
 from operator import le, lt, ge, gt
 
 #####  Set logger  #####

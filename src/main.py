@@ -4,23 +4,22 @@
 import sys
 
 # from src.Utils.utils import load_batch
-sys.path.insert(0,"Loading/")
-sys.path.insert(0,"Preprocessing/")
-sys.path.insert(0,"Modeling/")
-sys.path.insert(0,"Evaluation/")
+# sys.path.insert(0,"Loading/")
+# sys.path.insert(0,"Preprocessing/")
+# sys.path.insert(0,"Modeling/")
+# sys.path.insert(0,"Evaluation/")
 sys.path.insert(0,"Interpretability/")
-sys.path.insert(0,"Monitoring/")
+# sys.path.insert(0,"Monitoring/")
 sys.path.insert(0,"Utils/")
 
 import loading
-import preprocessing
-import modeling
+from preprocessing import preprocessing
+from modeling import modeling
 import utils as u
-import monitoring
-import data_quality  
+from monitoring import monitoring, outlier_detection
+from preprocessing import data_quality  
 import train_model
-import outlier_detection
-import evaluation
+from evaluation import evaluation
 
 import constants as cst
 import logging, json, pickle
@@ -117,4 +116,4 @@ def save_preprocessed_batch(sample_df_preprocessed_pred: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    main(1, 'evaluate')
+    main(1, 'process')

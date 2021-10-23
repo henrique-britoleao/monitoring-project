@@ -3,9 +3,9 @@
 #####  Imports  #####
 import sys
 
-sys.path.insert(0, "Preprocessing/")
+# sys.path.insert(0, "Preprocessing/")
 
-from preprocessing import *  # needed to recover preprocessor
+from preprocessing.preprocessing import *  # needed to recover preprocessor # TODO: implement dict and not globals
 
 import json, os
 from string import Template

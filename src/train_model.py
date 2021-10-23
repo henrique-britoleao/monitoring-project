@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from Loading import loading
-from Modeling import modeling
-from Evaluation import evaluation
+import loading
+from modeling import modeling
+from evaluation import evaluation
 from Utils import utils as u
 import constants as cst
 

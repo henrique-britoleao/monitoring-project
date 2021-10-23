@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 import pandas as pd
 import plotly.graph_objects as go
 
-from Evaluation import feature_importance
+from evaluation import feature_importance
 from Utils import utils as u
 import constants as cst
 

@@ -7,20 +7,20 @@ import streamlit as st
 import plotly.express as px
 import datetime
 
-from Evaluation import feature_importance
+from evaluation import feature_importance
 
 sys.path.insert(0, "..")
 
-from Loading import loading
-from Dashboard import model_perf_graph
-from Dashboard import concept_plots
-from Dashboard import feature_importance_plots
-from Dashboard import categorical_cov_plots
-from Dashboard import numerical_cov_plots
-from Dashboard import numerical_cov_plots
-from Dashboard import alert_plots
-from Dashboard import show_logs
-from Preprocessing import preprocessing
+import loading
+from dashboard import model_perf_graph
+from dashboard import concept_plots
+from dashboard import feature_importance_plots
+from dashboard import categorical_cov_plots
+from dashboard import numerical_cov_plots
+from dashboard import numerical_cov_plots
+from dashboard import alert_plots
+from dashboard import show_logs
+from preprocessing import preprocessing
 from main import main
 import constants as cst
 

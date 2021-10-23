@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from metrics_cov_drift import compute_covariate_drift_metrics
-from metrics_concept_drift import compute_concept_drift_metrics
+from monitoring.metrics_cov_drift import compute_covariate_drift_metrics
+from monitoring.metrics_concept_drift import compute_concept_drift_metrics
 import pandas as pd
 import json
 import constants as cst

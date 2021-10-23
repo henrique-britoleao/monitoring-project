@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 import constants as cst
 
-from Dashboard import plot_utils as pu
+from dashboard import plot_utils as pu
 
 ### NUMERICAL VARIABLES ###
 def plot_scaled_means(sample_df, batch_df, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):

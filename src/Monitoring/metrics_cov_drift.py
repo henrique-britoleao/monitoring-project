@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 
 import constants as cst
-import detect_alert
+import monitoring.detect_alert as detect_alert
 from operator import le, lt, ge, gt
 
 #####  Set logger  #####

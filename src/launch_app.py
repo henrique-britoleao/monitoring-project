@@ -1,8 +1,8 @@
 import pandas as pd
 import sys
 
-from Loading import loading
-from Dashboard import dashboard
+import loading
+from dashboard import dashboard
 
 import constants as cst
 

@@ -7,7 +7,7 @@ import pandas as pd
 import lightgbm as lgb
 from sklearn.ensemble import RandomForestClassifier
 
-from Modeling.pipeline_builder import build_prediction_pipeline
+from modeling.pipeline_builder import build_prediction_pipeline
 
 ####### LIGHTGBM  ########
 def get_GS_params_lightgbm():

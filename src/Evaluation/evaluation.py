@@ -10,7 +10,7 @@ from sklearn.metrics import recall_score, precision_score, f1_score
 from sklearn.metrics import accuracy_score, roc_auc_score, jaccard_score
 from sklearn.metrics import confusion_matrix
 
-from Preprocessing import preprocessing
+from preprocessing import preprocessing
 import constants as cst
 import numpy as np
 
