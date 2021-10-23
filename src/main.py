@@ -20,8 +20,18 @@ logger = logging.getLogger(__name__)
 argument_parser = argparse.ArgumentParser(
     description='Process to monitor a batch.'
 )
-argument_parser.add_argument('-m', '--mode', default='process', nargs=1, choices=['process', 'evaluate'], help='Defines the type of monitoring to perform')
-argument_parser.add_argument('--batch-id', help='Id of batch to be parsed', nargs=1, required=True)
+argument_parser.add_argument(
+    '-m', '--mode', 
+    default='process', 
+    nargs=1, 
+    choices=['process', 'evaluate'], 
+    help='Defines the type of monitoring to perform'
+)
+argument_parser.add_argument(
+    '--batch-id', 
+    help='Id of batch to be parsed', 
+    nargs=1, 
+    required=True)
 
 # Define main script
 def main(batch_id, mode="process"):
@@ -32,11 +42,7 @@ def main(batch_id, mode="process"):
         runner.process_batch(preprocessor=cst.PREPROCESSOR)
     if mode == "evaluate":
         runner.evaluate_batch(preprocessor=cst.PREPROCESSOR)
-        
 
-def usage():
-    # TODO
-    pass
         
 if __name__ == "__main__":
     args = argument_parser.parse_args()
