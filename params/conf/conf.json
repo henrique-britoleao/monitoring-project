@@ -9,6 +9,7 @@
 		"folder_metrics": "Metrics/",
 		"folder_monitoring": "Monitoring/",
 		"main_logger": "params/logs/main_logs.log",
+		"debug_logger": "params/log/debug_logs.log",
 		"training_logger": "params/logs/training_logs.log"
 	},
 	"log_level": "INFO",
