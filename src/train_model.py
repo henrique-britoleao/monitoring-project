@@ -4,7 +4,7 @@
 import loading
 from modeling import modeling
 from evaluation import evaluation
-from Utils import utils as u
+from utils import utils as u
 import constants as cst
 
 import pandas as pd

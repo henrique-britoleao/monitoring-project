@@ -1,25 +1,14 @@
 # -*- coding: utf-8 -*-
 
 ################## Importing libraries ####################
-import sys
-
-# from src.Utils.utils import load_batch
-# sys.path.insert(0,"Loading/")
-# sys.path.insert(0,"Preprocessing/")
-# sys.path.insert(0,"Modeling/")
-# sys.path.insert(0,"Evaluation/")
-sys.path.insert(0,"Interpretability/")
-# sys.path.insert(0,"Monitoring/")
-sys.path.insert(0,"Utils/")
-
 import loading
 from preprocessing import preprocessing
-from modeling import modeling
-import utils as u
-from monitoring import monitoring, outlier_detection
 from preprocessing import data_quality  
+from modeling import modeling
+from monitoring import monitoring, outlier_detection
 import train_model
 from evaluation import evaluation
+from utils import utils as u
 
 import constants as cst
 import logging, json, pickle
