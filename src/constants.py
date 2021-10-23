@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from preprocessing.preprocessing import *  # needed to recover preprocessor # TODO: implement dict and not globals
+# from preprocessing.preprocessing import MarketingPreprocessor 
 
 import json, os
 from string import Template
@@ -85,6 +85,3 @@ DEBUG_LOG_FILE_PATH = conf["paths"]["debug_logger"]
 TRAINING_LOG_FILE_PATH = conf["paths"]["training_logger"]
 
 BATCH_NAME_TEMPLATE = Template("batch${id}.csv")
-
-# recover preprocessor
-PREPROCESSOR = globals()[selected_dataset_information["preprocessor"]]()

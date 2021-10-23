@@ -8,7 +8,9 @@ import io
 
 import constants as cst
 
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def my_get_logger(path_log, log_level, my_name =""):
     """

@@ -2,7 +2,6 @@
 
 #####  Imports  #####
 from typing import Callable
-import logging
 
 from scipy.stats import chi2_contingency, fisher_exact, kruskal, ks_2samp
 
@@ -15,9 +14,9 @@ import constants as cst
 import monitoring.detect_alert as detect_alert
 from operator import le, lt, ge, gt
 
-#####  Set logger  #####
-logger = logging.getLogger("main_logger")
-
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 #####  Covariate drift metrics  #####
 StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, float]]
 

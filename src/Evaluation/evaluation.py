@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import logging
-logger = logging.getLogger(__name__)
-
 import pandas as pd
 from sklearn.base import ClassifierMixin
 from sklearn.base import clone
@@ -13,6 +10,10 @@ from sklearn.metrics import confusion_matrix
 from preprocessing import preprocessing
 import constants as cst
 import numpy as np
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def cross_evaluate_model_performance(clf: ClassifierMixin, X: pd.DataFrame, y: pd.DataFrame) -> dict:
     """

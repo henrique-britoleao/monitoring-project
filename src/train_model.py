@@ -9,8 +9,9 @@ import constants as cst
 
 import pandas as pd
 
-import logging
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Processors  #####
 def main_model_training_pipeline() -> None:

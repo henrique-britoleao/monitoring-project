@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import logging
-logger = logging.getLogger('main_logger')
-
 from typing import Tuple
 import pandas as pd
 
@@ -10,6 +6,10 @@ from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.metrics import make_scorer, f1_score
 
 from modeling.pipeline_builder import build_prediction_pipeline
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 ###### GRIDSEARCH ######
 def main_GS_from_estimator_and_params(X_train: pd.DataFrame, y_train: pd.Series, estimator, params_grid: dict) -> Tuple[dict, float]:

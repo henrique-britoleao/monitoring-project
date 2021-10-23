@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-
-import logging
-logger = logging.getLogger('main_logger')
-
 from modeling.gridsearch import main_GS_from_estimator_and_params
 from modeling.models import *
 
 import constants as cst
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def main_modeling_from_name (X_train, y_train):
     """

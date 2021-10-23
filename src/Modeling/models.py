@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-import logging
-logger = logging.getLogger('main_logger')
-
 import pandas as pd
 
 import lightgbm as lgb
 from sklearn.ensemble import RandomForestClassifier
 
 from modeling.pipeline_builder import build_prediction_pipeline
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 ####### LIGHTGBM  ########
 def get_GS_params_lightgbm():

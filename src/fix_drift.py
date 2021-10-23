@@ -1,15 +1,14 @@
-import sys
-
-sys.path.insert(0, "Loading/")
+import constants as cst
+import loading
+import train_model
 
 import pandas as pd
 import json
 import os
 
-import constants as cst
-import loading
-import train_model
-
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def train_drift_adjusted_model(batch_id: int) -> pd.DataFrame:
     drift_type = check_drift_type(batch_id)

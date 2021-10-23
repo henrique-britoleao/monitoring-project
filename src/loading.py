@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import constants as cst
+
 from pathlib import Path
 import pandas as pd
-import logging
-logger = logging.getLogger('main_logger')
 
-import constants as cst
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def read_csv_from_path(path: Path):
     """

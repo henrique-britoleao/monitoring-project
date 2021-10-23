@@ -5,13 +5,12 @@ import pandas as pd
 import numpy as np
 
 from typing import Callable
-import logging
 
 import monitoring.detect_alert as detect_alert
 from operator import le, lt, ge, gt
-
-#####  Set logger  #####
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Concept drift metrics  #####
 StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, float]]

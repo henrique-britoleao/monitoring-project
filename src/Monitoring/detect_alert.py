@@ -17,7 +17,8 @@ def alert(
         metric (str): metric we want to evalue
         sign ([type], optional): bigger than, smaller than. Defaults to ge.
     """
-    path = "../params/conf/conf.json"
+    # TODO: not read from conf
+    path = "params/conf/conf.json"
 
     with open(path, 'r') as config:
         dict_config = json.load(config)
