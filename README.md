@@ -39,13 +39,26 @@ can be trained by running at the `src/` level:
 python train_model.py
 ```
 
-Then the pipeline can be run by:
+**N.B.**: the training data must be placed in the `Inputs/` folder.
+
+The pipeline can be run independently from the command line by running the
+following commands from the root directory: 
 
 ```{bash}
-python main.py
+main.py [-h] [-m {process,evaluate}] --batch-id BATCH_ID
 ```
 
-The app can be launched by running:
+optional arguments:
+
+-m {process,evaluate}, --mode {process,evaluate}
+                    Defines the type of monitoring to perform
+                    
+--batch-id BATCH_ID   Id of batch to be parsed
+
+**N.B.**: the batch data must be placed in the `Inputs/Batches` folder. And follow 
+the naming template: `batch{id}.csv`
+
+Another option is to run the pipeline directly from the app, by running:
 
 ```{bash}
 streamlit run launch_app.py

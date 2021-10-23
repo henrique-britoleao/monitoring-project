@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from Loading import loading
-from Modeling import modeling
-from Evaluation import evaluation
-from Utils import utils as u
+import loading
+from modeling import modeling
+from evaluation import evaluation
+from utils import utils as u
 import constants as cst
 
 import pandas as pd

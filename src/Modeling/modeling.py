@@ -3,8 +3,8 @@
 import logging
 logger = logging.getLogger('main_logger')
 
-from Modeling.gridsearch import main_GS_from_estimator_and_params
-from Modeling.models import *
+from modeling.gridsearch import main_GS_from_estimator_and_params
+from modeling.models import *
 
 import constants as cst
 

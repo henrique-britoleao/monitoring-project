@@ -8,7 +8,7 @@ import plotly.express as px
 
 sys.path.insert(0, "..")
 
-from Dashboard import read_alerts
+from dashboard import read_alerts
 import constants as cst
 
 

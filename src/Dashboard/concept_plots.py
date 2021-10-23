@@ -8,9 +8,10 @@ import plotly.graph_objects as go
 
 import constants as cst
 
+
 def graph_target_prob_dist(
-    sample_df_pred: pd.DataFrame,
-    batch_df_pred: pd.DataFrame,
+    sample_df_pred_path: str,
+    batch_df_pred_path: str = cst.PREDICTED_TRAIN_FILE_PATH,
     colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"],
 ):
     """Plots the distribution of the prediction probabilities.
@@ -21,9 +22,17 @@ def graph_target_prob_dist(
         ["rgb(0, 0, 100)", "rgb(0, 200, 200)"].
     Returns:
         ff.Figure: Histogram with probability density curve
+
     """
+    # load dataframe
+    sample_df_pred = pd.read_csv(sample_df_pred_path, sep=";")
+    batch_df_pred = pd.read_csv(batch_df_pred_path, sep=";")
+
     # Histogram configuration
-    hist_data = [sample_df_pred[cst.y_pred_proba], batch_df_pred[cst.y_pred_proba]]
+    hist_data = [
+        sample_df_pred[cst.y_pred_proba_main_class],
+        batch_df_pred[cst.y_pred_proba_main_class],
+    ]
     group_labels = ["Sample Prediction Probabilities", "New Prediction Probabilities"]
 
     # Create distplot with custom bin_size
@@ -40,7 +49,7 @@ def graph_target_prob_dist(
     fig.update(
         layout_title_text=f"Probability Distribution of target {cst.y_pred_proba}"
     )
-    fig.show()
+    return fig
 
 
 def graph_target_labels(
@@ -90,4 +99,4 @@ def graph_target_labels(
     )
     # Change the bar mode
     fig.update_layout(barmode="group", title_text="Label Prediction Distribution in %")
-    fig.show()
+    return fig

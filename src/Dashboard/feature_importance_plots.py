@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 import pandas as pd
 import plotly.graph_objects as go
 
-from Evaluation import feature_importance
-from Utils import utils as u
+from evaluation import feature_importance
+from utils import utils as u
 import constants as cst
 
 def graph_feature_importance(sample_df: pd.DataFrame, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):
