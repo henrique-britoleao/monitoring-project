@@ -9,12 +9,13 @@ import numpy as np
 
 #####  Set Logger  #####
 from src.utils.loggers import MainLogger
+
 logger = MainLogger.getLogger(__name__)
 
-def detect_drift_in_streaming_data(numerical_cols: list,
-                                        sample_df: pd.DataFrame, 
-                                        batch_df: pd.DataFrame,
-                                        ) -> None:
+
+def detect_drift_in_streaming_data(
+    numerical_cols: list, sample_df: pd.DataFrame, batch_df: pd.DataFrame,
+) -> None:
     """Detects numerical drift by adding stream elements from the new batch to a window
     and verifying if drift occurred (in the batch data only).
     
@@ -29,9 +30,10 @@ def detect_drift_in_streaming_data(numerical_cols: list,
     detect_drift_adwin_method(numerical_cols, sample_df, batch_df)
     detect_drift_hddm_a_method(numerical_cols, sample_df, batch_df)
 
-def detect_drift_adwin_method(numerical_cols: list,
-                                    sample_df: pd.DataFrame, 
-                                    batch_df: pd.DataFrame) -> None:
+
+def detect_drift_adwin_method(
+    numerical_cols: list, sample_df: pd.DataFrame, batch_df: pd.DataFrame
+) -> None:
     """Detects numerical drift by adding stream elements from the new batch to ADWIN
     and verifying if drift occurred (in the batch data only).
     
@@ -50,11 +52,19 @@ def detect_drift_adwin_method(numerical_cols: list,
         for i in range(len(data_stream)):
             adwin.add_element(data_stream[i])
             if adwin.detected_change():
-                logger.info('Change detected in data: ' + str(data_stream[i]) + ' - at index: ' + str(i) + 'for column:' + col)
+                logger.info(
+                    "Change detected in data: "
+                    + str(data_stream[i])
+                    + " - at index: "
+                    + str(i)
+                    + "for column:"
+                    + col
+                )
 
-def detect_drift_hddm_a_method(numerical_cols: list,
-                                    sample_df: pd.DataFrame, 
-                                    batch_df: pd.DataFrame) -> None:
+
+def detect_drift_hddm_a_method(
+    numerical_cols: list, sample_df: pd.DataFrame, batch_df: pd.DataFrame
+) -> None:
     """Detects numerical drift by adding stream elements from the new batch to HDDM_A
     and verifying if drift occurred (in the batch data only).
     
@@ -77,6 +87,10 @@ def detect_drift_hddm_a_method(numerical_cols: list,
                 pass
             else:
                 if hddm_a.detected_warning_zone():
-                    logger.info(f"Warning zone detected in data (HDDM_A): {str(data_stream[i])} - at index: {str(i)} for column {col}")
+                    logger.info(
+                        f"Warning zone detected in data (HDDM_A): {str(data_stream[i])} - at index: {str(i)} for column {col}"
+                    )
                 if hddm_a.detected_change():
-                    logger.info(f"Change detected in data (HDDM_A): {str(data_stream[i])} - at index: {str(i)} for column {col}")
+                    logger.info(
+                        f"Change detected in data (HDDM_A): {str(data_stream[i])} - at index: {str(i)} for column {col}"
+                    )

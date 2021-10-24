@@ -20,6 +20,17 @@ def compute_concept_drift_metrics(
     metrics_dict: dict[str, StatisticComputer]
 ) -> dict:
     metrics = dict()
+    """Computes concept drift between sample and batch data's target.
+
+    Args:
+        sample_target (pd.Series): target column of sample data
+        batch_target (pd.Series): target column of batch data
+        metrics_dict (dict): dictionary of metrics to compute
+
+    Returns:
+        metrics (dict): dictionary of computed metrics
+
+    """
     
     for metric_name, config_dict in metrics_dict.items():
         # recover function from name
@@ -35,7 +46,7 @@ def compute_psi(
     sample_data: pd.Series, batch_data: pd.Series, buckets: int = 10
 ) -> float:
     """Computes covariate drift between sample and batch data of specific column
-       for numerical columns
+       for numerical columns.
 
     Args:
         sample_data (pd.Series): column containing the prediction probabilities
