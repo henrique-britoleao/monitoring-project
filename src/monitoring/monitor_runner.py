@@ -13,9 +13,9 @@ from datetime import datetime as dt
 import pandas as pd
 import os
 
-#####  Get logger  #####
-import logging
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Monitor runner  #####
 class MonitorRunner:

@@ -5,14 +5,21 @@ from contextlib import contextmanager
 from io import StringIO
 import sys
 
-@contextmanager
-def st_redirect(src, dst):
     '''
     redirects the standard stream (can be stdout or stderr) to streamlit
 
     src: file object
     dst: streamlit display funtion
     '''
+
+@contextmanager
+def st_redirect(src, dst):
+    """Redirect the standard stream (can be stdout or stderr) to Streamlit
+
+    Args:
+        src (file): file objet
+        dst: Streamlit display function
+    """
     placeholder = st.empty()
     output_func = getattr(placeholder, dst)
 

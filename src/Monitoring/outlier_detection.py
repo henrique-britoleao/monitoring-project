@@ -13,8 +13,9 @@ from plotly.graph_objs._figure import Figure
 
 import constants as cst
 
-#####  Set logger  #####
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Outlier detection  #####
 def build_outlier_dict(df_preprocessed: pd.DataFrame) -> dict:

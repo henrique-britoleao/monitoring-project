@@ -26,6 +26,8 @@ import constants as cst
 
 
 class DashboardApp:
+    """Class to generate a streamlit app combined all required graphs in 4 pages
+    """
     def __init__(self, sample_df):
         self.sample_df = sample_df
         self.batch_df = None
@@ -106,7 +108,7 @@ class DashboardApp:
             st.subheader("Model performance evolution")
             st.write("Visualize classification performance metrics (cross-validation scores using the training data vs. true performance on the batch data:")
             fig_model_performance = model_perf_graph.plot_performance(
-                batch_name=self.batch_name[:-4],
+                batch_name=self.batch_name,
                 batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH,
                 train_perf_path=cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH,
             )
@@ -161,6 +163,14 @@ class DashboardApp:
             st.plotly_chart(fig_cov_drift)
 
     def create_categorical_distribution_plots(self, categorical_col="Education"):
+        """Function to create categorical distribution plots 
+
+        Args:
+            categorical_col (str, optional): categorical column to plot. Defaults to "Education".
+
+        Returns:
+            Tuple: tuple with two required ploty figures
+        """
         fig_categorical_dist = categorical_cov_plots.graph_categorical_dist(
             self.sample_df, self.batch_df, categorical_col
         )
@@ -170,12 +180,25 @@ class DashboardApp:
         return fig_categorical_dist, fig_categorical_dist_diff
 
     def create_numerical_distribution_plots_all_cols(self):
+        """Function to plot numerical distributions for all numerical columns
+
+        Returns:
+            Figure: plotly figure with scaled means for all numerical features in sample vs batch
+        """
         fig_numerical_scaled_means = numerical_cov_plots.plot_scaled_means(
             self.sample_df, self.batch_df
         )
         return fig_numerical_scaled_means
 
     def create_numerical_distribution_plots(self, numerical_col="Income"):
+        """Function to create numerical distribution plots 
+
+        Args:
+            numerical_col (str, optional): numerical column to plot. Defaults to "Education".
+
+        Returns:
+            Tuple: tuple with two required ploty figures
+        """
         fig_numerical_boxplot = numerical_cov_plots.plot_quartiles_numerical_variables(
             self.sample_df, self.batch_df, numerical_col
         )
@@ -185,6 +208,11 @@ class DashboardApp:
         return fig_numerical_boxplot, fig_numerical_dist
 
     def create_feature_importance_plot(self):
+        """Function to plot feature importance values based on permutation importance
+
+        Returns:
+            Figure: ploty barchart for feature importance
+        """
         fig_feature_importance = feature_importance_plots.graph_feature_importance(
             self.sample_df
         )
@@ -195,4 +223,14 @@ class DashboardApp:
 def batch_preprocess(
     batch_df: pd.DataFrame, column_types, preprocessor: preprocessing.Preprocessor
 ):
+    """Function to preprocess a batch dataset using the predefined preprocessor
+
+    Args:
+        batch_df (pd.DataFrame)
+        column_types (list)
+        preprocessor (preprocessing.Preprocessor): preprocessor class
+
+    Returns:
+        pd.DataFrame: preprocessed batch dataset
+    """
     return preprocessor(batch_df, column_types)

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-import logging
 import pandas as pd
 
-#####  Set logger  #####
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def check_data_quality(sample_df: pd.DataFrame, batch_df: pd.DataFrame) -> dict[str, int]:
     """Checks overall data quality of a new batch of data comapred to 

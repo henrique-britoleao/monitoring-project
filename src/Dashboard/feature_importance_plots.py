@@ -1,15 +1,16 @@
 
 # -*- coding: utf-8 -*-
 
-import logging
-logger = logging.getLogger(__name__)
-
 import pandas as pd
 import plotly.graph_objects as go
 
 from evaluation import feature_importance
 from utils import utils as u
 import constants as cst
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def graph_feature_importance(sample_df: pd.DataFrame, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):
     """Plot feature importance 
@@ -29,6 +30,14 @@ def graph_feature_importance(sample_df: pd.DataFrame, colors: list = ["rgb(0, 0,
     return fig
 
 def get_feature_importance_to_plot(sample_df):
+    """Compute feature importance using permutation importance on the selected model and the training data
+
+    Args:
+        sample_df (pd.DataFrame): training data
+
+    Returns:
+        pd.DataFrame: dataframe with features as index and importance scores as values
+    """
     model = u.load_model()
     X_train = sample_df.copy()
     for col in [

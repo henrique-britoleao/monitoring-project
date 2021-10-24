@@ -7,13 +7,19 @@ import pandas as pd
 def plot_performance(
     batch_perf_path: str = cst.PERFORMANCE_METRICS_FILE_PATH,
     train_perf_path: str = cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH,
-    batch_name: str = "batch1",
+    batch_name: str = "batch1.csv",
 ):
-    """Creates barplot to compare training performance vs batch performance
+    """Plot model performance on the training set (cross-eval) vs on the batch dataset
+
     Args:
-        json_path (str, optional): path to json file with performance metrics of models.
-                                   Defaults to constants.PERFORMANCE_METRICS_FILE_PATH.
-        batch_name (str, optional): Which batch is being analysed. Defaults to "batch1".
+        batch_perf_path (str, optional): json file containing the latest performance metrics
+            computed on the batch data (incl. true labels). Defaults to cst.PERFORMANCE_METRICS_FILE_PATH.
+        train_perf_path (str, optional): json file containing the training metrics. 
+            Defaults to cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH.
+        batch_name (str, optional): batch name. Defaults to "batch1".
+
+    Returns:
+        Figure: plotly figure with performance metrics on the train vs batch sets
     """
     # TRAINING DATA
     # GET VALUES OF TRAIN
@@ -30,7 +36,10 @@ def plot_performance(
     # Opening JSON file
     
     with open(batch_perf_path) as json_file:
-        batch_perf = json.load(json_file)
+        performance_metrics = json.load(json_file)
+    
+    batch_perf = _get_batch_metrics(batch_name, performance_metrics)    
+    
     # saving performance keys of chosen batch
     perf_metrics = list(batch_perf[batch_name].keys())
     # delete confusion matrix
@@ -67,3 +76,13 @@ def plot_performance(
         title_text=f"Model performance of training sample vs batch",
     )
     return fig
+
+def _get_batch_metrics(batch_name: str, performance_metrics: list[dict]) -> dict:
+    print(f'{batch_name=}')
+    for batch_data in performance_metrics[::-1]: # recover performances from last run to first
+        recovered_name = list(batch_data.keys())[0]
+        print(f'{recovered_name=}')
+        if recovered_name == batch_name:
+            return batch_data
+        else:
+            pass

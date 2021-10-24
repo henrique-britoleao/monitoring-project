@@ -7,9 +7,9 @@ import pandas as pd
 import json
 import constants as cst
 
-#####  Set logger  #####
-import logging
-logger = logging.getLogger(__name__)
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Compute metrics  #####
 
