@@ -9,11 +9,21 @@ import logging
 logs_format = '[%(levelname)s - %(asctime)s] %(name)s: %(message)s'
 
 class MainLogger:
-    """TODO"""
+    """Class to manage the creation of the main logger."""
+    
     formatter = logging.Formatter(logs_format)
+    
     @classmethod
     def getLogger(cls, name=None) -> logging.Logger:
-        """TODO"""
+        """Creates a logger and adds three handlers. One to stdout, another to 
+        a main logging file and the last one to a debugging logging file.
+
+        Args:
+            name ([type], optional): logger name. Defaults to None.
+
+        Returns:
+            logging.Logger: object used to log entries.
+        """
         logger = logging.getLogger(name)
         logger.setLevel(logging.DEBUG)
         
@@ -35,11 +45,23 @@ class MainLogger:
         
         return logger
     
+    
 class AlertLogger:
+    """Class to manage the creation of the alert logger."""
+    
     formatter = logging.Formatter(logs_format)
+    
     @classmethod
     def getLogger(cls, name=None) -> logging.Logger:
-        """TODO"""
+        """Creates a logger and adds two handlers. One to stdout, another to 
+        an alert file.
+
+        Args:
+            name (optional): logger name. Defaults to None.
+
+        Returns:
+            logging.Logger: object used to log entries.
+        """
         logger = logging.getLogger(name)
         logger.setLevel(logging.WARNING)
         
