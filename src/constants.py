@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+"""Reads the configurations from params/conf/conf.json and stores values in 
+constants to be used across the project."""
 
 #####  Imports  #####
-# from preprocessing.preprocessing import MarketingPreprocessor 
+# from preprocessing.preprocessing import MarketingPreprocessor
 
 import json, os
 from string import Template
@@ -80,9 +82,11 @@ TRAIN_PERFORMANCE_METRICS_FILE_PATH = os.path.join(
     METRICS_PATH, TRAIN_PERFORMANCE_METRICS_FILE_NAME
 )
 
+# Log files
 MAIN_LOG_FILE_PATH = conf["paths"]["main_logger"]
 DEBUG_LOG_FILE_PATH = conf["paths"]["debug_logger"]
 TRAINING_LOG_FILE_PATH = conf["paths"]["training_logger"]
 ALERT_LOG_FILE_PATH = conf["paths"]["alert_logger"]
 
+# Naming templates
 BATCH_NAME_TEMPLATE = Template("batch${id}.csv")

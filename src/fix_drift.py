@@ -1,3 +1,5 @@
+"""Module housing functions to deal with detected drift. Can be run by itself."""
+#####  Imports  #####
 import constants as cst
 import loading
 import train_model
@@ -8,9 +10,17 @@ import os
 
 #####  Set Logger  #####
 from src.utils.loggers import MainLogger
+
 logger = MainLogger.getLogger(__name__)
 
-def train_drift_adjusted_model(batch_id: int) -> pd.DataFrame:
+#####  Fix drift  #####
+def train_drift_adjusted_model(batch_id: int) -> None:
+    """Trains a new model implementing the adequate strategy to deal with the
+    drift identified in the batch.
+
+    Args:
+        batch_id (int): ID of the batch being analysed
+    """
     drift_type = check_drift_type(batch_id)
 
     batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)
@@ -31,6 +41,15 @@ def train_drift_adjusted_model(batch_id: int) -> pd.DataFrame:
 
 
 def check_drift_type(batch_id: int) -> str:
+    """Detects the type of drift present in a batch.
+
+    Args:
+        batch_id (int): ID of the batch being analysed
+
+    Returns:
+        str: type of drift detected. Can be "Concept drift", "No shift", or
+        "Covariate drift".
+    """
     with open(cst.MONITORING_METRICS_FILE_PATH, "r") as config:
         dict_metrics = json.load(config)
 
@@ -80,4 +99,6 @@ def check_drift_type(batch_id: int) -> str:
 
 
 if __name__ == "__main__":
-    train_drift_adjusted_model(1)
+    train_drift_adjusted_model(
+        1
+    )  # TODO: implement options to chose which batch to adjust
