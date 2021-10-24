@@ -4,12 +4,15 @@ from threading import current_thread
 from contextlib import contextmanager
 from io import StringIO
 import sys
-import logging
-import time
-import pandas as pd
 
 @contextmanager
 def st_redirect(src, dst):
+    '''
+    redirects the standard stream (can be stdout or stderr) to streamlit
+
+    src: file object
+    dst: streamlit display funtion
+    '''
     placeholder = st.empty()
     output_func = getattr(placeholder, dst)
 
@@ -31,30 +34,7 @@ def st_redirect(src, dst):
 
 
 @contextmanager
-def st_stdout(dst):
-    "this will show the prints"
-    with st_redirect(sys.stdout, dst):
-        yield
-
-
-@contextmanager
 def st_stderr(dst):
-    "This will show the logging"
+    '''This will show the logging'''
     with st_redirect(sys.stderr, dst):
         yield
-
-
-'''def demo_function():
-    """
-    Just a sample function to show how it works.
-    :return:
-    """
-    for i in range(10):
-        logging.warning(f'Counting... {i}')
-        time.sleep(2)
-        print('Time out...')
-
-
-if __name__ == '__main__':
-    with st_stderr("code"):
-        check_data_quality(sample_df, batch_df)'''
