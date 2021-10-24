@@ -27,12 +27,11 @@ import constants as cst
 class DashboardApp:
     """Class to generate a streamlit app combined all required graphs in 4 pages
     """
-
+    batch_id = 0
     def __init__(self, sample_df):
         self.sample_df = sample_df
         self.batch_df = None
         self.batch_name = None
-        self.batch_id = 1
         # TODO
         self.option = None
 
@@ -64,15 +63,15 @@ class DashboardApp:
         self.option = option
         uploaded_file = st.sidebar.file_uploader("Choose a file")
         if uploaded_file is not None:
-            self.batch_df = pd.read_csv(uploaded_file, sep=None, engine="python")
-            self.batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=self.batch_id)
+            self.batch_df = pd.read_csv(uploaded_file, sep=None, engine='python')
+            DashboardApp.batch_id += 1 #increment counter
+            self.batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=DashboardApp.batch_id)
             loading.write_csv_from_path(
                 self.batch_df, os.path.join(cst.BATCHES_PATH, self.batch_name)
             )
             self.batch_df = batch_preprocess(
                 self.batch_df, cst.column_types, preprocessing.MarketingPreprocessor()
             )
-            self.batch_id += 1  # increment counter
 
     def create_main_pages(self):
         """
@@ -96,8 +95,8 @@ class DashboardApp:
             st.subheader("Streaming Data Evolution")
             st.markdown("Identifying potential concept drift. ")
             with show_logs.st_stderr("code"):
-                main(self.batch_id - 1)
-                graph = alert_plots.alerts_graph(self.batch_name, self.batch_id - 2)
+                main(DashboardApp.batch_id - 1)
+                graph = alert_plots.alerts_graph(self.batch_name, DashboardApp.batch_id - 2)
                 st.graphviz_chart(graph)
 
             # Placeholder: Data description (initial vs batch).
@@ -127,7 +126,7 @@ class DashboardApp:
         if self.option == "Feature Distribution Analysis" and self.batch_df is not None:
             st.title("Feature Distribution Analysis")
             st.subheader("Column Alerts")
-            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, self.batch_id - 2)
+            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, DashboardApp.batch_id - 2)
             st.plotly_chart(fig_heatmap)
 
             st.subheader("Numerical Columns")
