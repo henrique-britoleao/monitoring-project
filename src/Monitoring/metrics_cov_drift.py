@@ -14,15 +14,19 @@ import numpy as np
 
 #####  Set Logger  #####
 from src.utils.loggers import MainLogger, AlertLogger
+
 main_logger = MainLogger.getLogger(__name__)
-alert_logger = AlertLogger.getLogger('Alert Logger')
+alert_logger = AlertLogger.getLogger("Alert Logger")
 
 #####  Covariate drift metrics  #####
 StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, float]]
 
+
 def compute_covariate_drift_metrics(
-    sample_df: pd.DataFrame, batch_df: pd.DataFrame, 
-    metrics_dict: dict[str, dict[str, StatisticComputer]]) -> dict:
+    sample_df: pd.DataFrame,
+    batch_df: pd.DataFrame,
+    metrics_dict: dict[str, dict[str, StatisticComputer]],
+) -> dict:
     """Computes the covariate drift metrics comparing the distributions of the
     covariates in the original dataset and the new batch.  
 
@@ -81,15 +85,18 @@ def compute_covariate_drift_metrics(
     """
     # initialize output dict
     metrics = dict()
-    
+
     dfs = [sample_df, batch_df]
     # compute metrics
-    numerical_metrics = compute_statistics(cst.numerical_columns, *dfs,
-                                           metrics_dict['numerical'])
-    categorical_metrics = compute_statistics(cst.categorical_columns, *dfs, 
-                                             metrics_dict['categorical'])
-    binary_metrics = compute_statistics(cst.binary_columns, *dfs, 
-                                        metrics_dict['binary'])
+    numerical_metrics = compute_statistics(
+        cst.numerical_columns, *dfs, metrics_dict["numerical"]
+    )
+    categorical_metrics = compute_statistics(
+        cst.categorical_columns, *dfs, metrics_dict["categorical"]
+    )
+    binary_metrics = compute_statistics(
+        cst.binary_columns, *dfs, metrics_dict["binary"]
+    )
 
     # update output dict
     metrics.update(
@@ -104,9 +111,13 @@ def compute_covariate_drift_metrics(
 
     return metrics
 
-def compute_statistics(selected_cols: list, sample_df: pd.DataFrame,
-                       batch_df: pd.DataFrame, 
-                       stats_dict: dict[str, StatisticComputer]) -> dict:
+
+def compute_statistics(
+    selected_cols: list,
+    sample_df: pd.DataFrame,
+    batch_df: pd.DataFrame,
+    stats_dict: dict[str, StatisticComputer],
+) -> dict:
     """Computes required test statistics and the associated p-values for a set
     of columns present in both the original data and the batch data. 
     
@@ -132,55 +143,84 @@ def compute_statistics(selected_cols: list, sample_df: pd.DataFrame,
         metrics_dict[col] = {}
         # calculate metrics
         for stats_name, config_dict in stats_dict.items():
-            stats_func = globals()[config_dict['function']]
+            stats_func = globals()[config_dict["function"]]
             stats_results = stats_func(sample_df[col], batch_df[col])
             # store metrics in dict
-            metrics_dict[col].update(
-                {stats_name: stats_results}
-            )
+            metrics_dict[col].update({stats_name: stats_results})
 
     return metrics_dict
 
 
 #####  Statistics wrappers  #####
-def compute_chi_sq_stats(sample_data: pd.Series, batch_data: pd.Series, 
-                         **kwargs):
+def compute_chi_sq_stats(sample_data: pd.Series, batch_data: pd.Series, **kwargs):
     """Wrapper of scipy.stats.chi2_contingency function."""
     contingency_table = build_contingency_table(sample_data, batch_data)
     test_val, p_val, _, _ = chi2_contingency(contingency_table, *kwargs)
-    alert = detect_alert.alert(p_val, "chi_squared", "categorical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using a Chi-Squared test! P-value: {p_val}", le)
+    alert = detect_alert.alert(
+        p_val,
+        "chi_squared",
+        "categorical",
+        "covariate_drift",
+        f"Detected covariate drift in column {sample_data.name} using a Chi-Squared test! P-value: {p_val}",
+        le,
+    )
 
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
-def compute_fisher_stats(sample_data: pd.Series, batch_data: pd.Series, 
-                         **kwargs):
+
+def compute_fisher_stats(sample_data: pd.Series, batch_data: pd.Series, **kwargs):
     """Wrapper of scipy.stats.fisher_exact function."""
     contingency_table = build_contingency_table(sample_data, batch_data)
     test_val, p_val = fisher_exact(contingency_table, *kwargs)
-    alert = detect_alert.alert(p_val, "fisher_test", "binary", "covariate_drift",f"Detected covariate drift in column {sample_data.name} using a Fisher test! P-value: {p_val}",  le)
+    alert = detect_alert.alert(
+        p_val,
+        "fisher_test",
+        "binary",
+        "covariate_drift",
+        f"Detected covariate drift in column {sample_data.name} using a Fisher test! P-value: {p_val}",
+        le,
+    )
 
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
-def compute_kruskal_wallis_test(sample_data: pd.Series, batch_data: pd.Series, 
-                                **kwargs):
+
+def compute_kruskal_wallis_test(
+    sample_data: pd.Series, batch_data: pd.Series, **kwargs
+):
     """Wrapper of scipy.stats.kruskal function."""
     test_val, p_val = kruskal(sample_data, batch_data, **kwargs)
-    alert = detect_alert.alert(p_val, "kruskal_wallis", "numerical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using a Kruskal-Wallis test! P-value: {p_val}", le)
-    
+    alert = detect_alert.alert(
+        p_val,
+        "kruskal_wallis",
+        "numerical",
+        "covariate_drift",
+        f"Detected covariate drift in column {sample_data.name} using a Kruskal-Wallis test! P-value: {p_val}",
+        le,
+    )
+
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
-def compute_kolmogorov_smirnov_test(sample_data: pd.Series, 
-                                    batch_data: pd.Series, **kwargs):
+
+def compute_kolmogorov_smirnov_test(
+    sample_data: pd.Series, batch_data: pd.Series, **kwargs
+):
     """Wrapper of scipy.stats.ks_2samp function."""
     test_val, p_val = ks_2samp(sample_data, batch_data, **kwargs)
-    alert = detect_alert.alert(p_val, "kolmogorov_smirnov", "numerical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using a Kolmogorov-Smirnov test! P-value: {p_val}",le)
-    
+    alert = detect_alert.alert(
+        p_val,
+        "kolmogorov_smirnov",
+        "numerical",
+        "covariate_drift",
+        f"Detected covariate drift in column {sample_data.name} using a Kolmogorov-Smirnov test! P-value: {p_val}",
+        le,
+    )
+
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
 
 #####  Compute CSI metrics  #####
 def compute_csi_numerical(
-    sample_data: pd.Series, batch_data: pd.Series, buckets: int=10
+    sample_data: pd.Series, batch_data: pd.Series, buckets: int = 10
 ) -> float:
     """Computes covariate drift between sample and batch data of specific column
        for numerical columns
@@ -196,7 +236,9 @@ def compute_csi_numerical(
     """
     # define probability breakpoints for each bucket
     raw_breakpoints = np.arange(0, buckets + 1) / (buckets) * 100
-    breakpoints = scale_range(raw_breakpoints, float(np.min(sample_data)), float(np.max(sample_data)))
+    breakpoints = scale_range(
+        raw_breakpoints, float(np.min(sample_data)), float(np.max(sample_data))
+    )
 
     # value count of probabilities for each bucket
     sample_counts = np.histogram(sample_data, breakpoints)[0]
@@ -223,13 +265,20 @@ def compute_csi_numerical(
 
     # get overall PSI
     csi_total = np.round(sum(csi_df["CSI"]), 3)
-    alert = detect_alert.alert(csi_total , "CSI", "numerical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using CSI! CSI value: {csi_total}",ge)
-    
+    alert = detect_alert.alert(
+        csi_total,
+        "CSI",
+        "numerical",
+        "covariate_drift",
+        f"Detected covariate drift in column {sample_data.name} using CSI! CSI value: {csi_total}",
+        ge,
+    )
+
     return {"csi_value": csi_total, "alert": alert}
 
 
 def compute_csi_categorical(
-    sample_data: pd.Series, batch_data: pd.Series, buckets: int=10
+    sample_data: pd.Series, batch_data: pd.Series, buckets: int = 10
 ) -> float:
     """Computes covariate drift between sample and batch data of specific column
        for categorical columns
@@ -280,13 +329,22 @@ def compute_csi_categorical(
 
     # get overall PSI
     csi_total = np.round(sum(csi_df["CSI"]), 3)
-    alert = detect_alert.alert(csi_total , "CSI", "categorical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using CSI! CSI value: {csi_total}", ge)
+    alert = detect_alert.alert(
+        csi_total,
+        "CSI",
+        "categorical",
+        "covariate_drift",
+        f"Detected covariate drift in column {sample_data.name} using CSI! CSI value: {csi_total}",
+        ge,
+    )
 
     return {"csi_value": csi_total, "alert": alert}
 
 
 #####  Compute data drift  #####
-def detect_drift_adwin_method(sample_data: pd.Series, batch_data: pd.Series) -> dict[str, int]:
+def detect_drift_adwin_method(
+    sample_data: pd.Series, batch_data: pd.Series
+) -> dict[str, int]:
     """
     TODO: redo this
     Detects numerical drift by adding stream elements from the new batch to ADWIN
@@ -302,22 +360,31 @@ def detect_drift_adwin_method(sample_data: pd.Series, batch_data: pd.Series) -> 
     adwin = ADWIN()
     data_stream = np.concatenate((sample_data, batch_data))
     col_name = sample_data.name
-    
+
     # initialize alert
     alert = 0
-    
+
     # Adding stream elements to ADWIN and verifying if drift occurred
     for i in range(len(data_stream)):
         adwin.add_element(data_stream[i])
         if adwin.detected_change():
             alert = 1
-            alert_logger.warning('Change detected in data: ' + str(data_stream[i]) + ' - at index: ' + str(i) + 'for column:' + col_name)
-            
+            alert_logger.warning(
+                "Change detected in data: "
+                + str(data_stream[i])
+                + " - at index: "
+                + str(i)
+                + "for column:"
+                + col_name
+            )
+
     return {"alert": alert}
-    
+
+
 #####  Utils functions  #####
-def build_contingency_table(sample_data: pd.Series, 
-                            batch_data: pd.Series) -> pd.DataFrame:
+def build_contingency_table(
+    sample_data: pd.Series, batch_data: pd.Series
+) -> pd.DataFrame:
     """Builds a contingency table for categorical and binary data contained in 
     the original and batch data.
 
@@ -330,11 +397,10 @@ def build_contingency_table(sample_data: pd.Series,
         pd.DataFrame: contingency table
     """
     categorical_values = pd.concat([sample_data, batch_data])
-    data_origins = np.array(
-        ["sample"] * len(sample_data) + ["batch"] * len(batch_data)
-    )
+    data_origins = np.array(["sample"] * len(sample_data) + ["batch"] * len(batch_data))
 
     return pd.crosstab(index=categorical_values, columns=data_origins)
+
 
 def scale_range(input, min, max) -> np.array:
     """Scales the raw breakpoints from 0 to 1.
@@ -350,5 +416,5 @@ def scale_range(input, min, max) -> np.array:
     input += -(np.min(input))
     input /= np.max(input) / (max - min)
     input += min
-    
+
     return input

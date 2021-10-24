@@ -8,10 +8,12 @@ from operator import ge
 
 #####  Set Logger  #####
 from src.utils.loggers import AlertLogger
+
 logger = AlertLogger.getLogger("Alert Logger")
 
 #####  Alert  #####
 SignOperator = Callable[[Number, Number], bool]
+
 
 def alert(
     value: float,
@@ -19,7 +21,7 @@ def alert(
     data_type: str,
     drift_type: str,
     alert_msg: str,
-    sign: SignOperator=ge,
+    sign: SignOperator = ge,
 ) -> bool:
     """outputs alert 0 or 1 depending on treshhold rule
     a < b -> lt(a, b)
@@ -38,9 +40,13 @@ def alert(
     """
 
     if drift_type == "concept_drift":
-        threshold = cst.selected_dataset_information["metrics_setup"][drift_type][metric]['threshold']
+        threshold = cst.selected_dataset_information["metrics_setup"][drift_type][
+            metric
+        ]["threshold"]
     else:
-        threshold = cst.selected_dataset_information["metrics_setup"][drift_type][data_type][metric]['threshold']
+        threshold = cst.selected_dataset_information["metrics_setup"][drift_type][
+            data_type
+        ][metric]["threshold"]
 
     if sign(value, threshold):
         alert = 1

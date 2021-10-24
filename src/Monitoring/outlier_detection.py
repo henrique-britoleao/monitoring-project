@@ -15,6 +15,7 @@ import constants as cst
 
 #####  Set Logger  #####
 from src.utils.loggers import MainLogger
+
 logger = MainLogger.getLogger(__name__)
 
 #####  Outlier detection  #####
@@ -75,9 +76,8 @@ def detect_outliers(
 
     # One-hot encode categorical columns to apply the model
     encoder = make_column_transformer(
-        (OneHotEncoder(), cst.categorical_columns), 
-        remainder="passthrough"
-        )
+        (OneHotEncoder(), cst.categorical_columns), remainder="passthrough"
+    )
     df_preprocessed = encoder.fit_transform(df_preprocessed)
 
     clf = IsolationForest(
@@ -97,7 +97,7 @@ def detect_outliers(
     return df_outlier
 
 
-def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> Figure: # TODO: move to dashboard
+def plot_outliers(df_preprocessed: pd.DataFrame, path: str = None) -> Figure:
     """Save outlier plot from output dataframe of detect_outliers function.
 
     Args:
