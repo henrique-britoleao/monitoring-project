@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-from typing import Callable
-import logging
+import monitoring.detect_alert as detect_alert
+import constants as cst
 
 from scipy.stats import chi2_contingency, fisher_exact, kruskal, ks_2samp
+from skmultiflow.drift_detection import ADWIN
 
-from skmultiflow.drift_detection import ADWIN, HDDM_A
-
+from operator import le, ge
+from typing import Callable
 import pandas as pd
 import numpy as np
 
-import constants as cst
-import monitoring.detect_alert as detect_alert
-from operator import le, lt, ge, gt
-
-#####  Set logger  #####
-logger = logging.getLogger("main_logger")
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger, AlertLogger
+main_logger = MainLogger.getLogger(__name__)
+alert_logger = AlertLogger.getLogger('Alert Logger')
 
 #####  Covariate drift metrics  #####
 StatisticComputer = Callable[[pd.Series, pd.Series], dict[str, float]]
@@ -149,7 +148,7 @@ def compute_chi_sq_stats(sample_data: pd.Series, batch_data: pd.Series,
     """Wrapper of scipy.stats.chi2_contingency function."""
     contingency_table = build_contingency_table(sample_data, batch_data)
     test_val, p_val, _, _ = chi2_contingency(contingency_table, *kwargs)
-    alert = detect_alert.alert(p_val, "chi_squared", "categorical", "covariate_drift", le)
+    alert = detect_alert.alert(p_val, "chi_squared", "categorical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using a Chi-Squared test! P-value: {p_val}", le)
 
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
@@ -158,7 +157,7 @@ def compute_fisher_stats(sample_data: pd.Series, batch_data: pd.Series,
     """Wrapper of scipy.stats.fisher_exact function."""
     contingency_table = build_contingency_table(sample_data, batch_data)
     test_val, p_val = fisher_exact(contingency_table, *kwargs)
-    alert = detect_alert.alert(p_val, "fisher_test", "binary", "covariate_drift", le)
+    alert = detect_alert.alert(p_val, "fisher_test", "binary", "covariate_drift",f"Detected covariate drift in column {sample_data.name} using a Fisher test! P-value: {p_val}",  le)
 
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
@@ -166,7 +165,7 @@ def compute_kruskal_wallis_test(sample_data: pd.Series, batch_data: pd.Series,
                                 **kwargs):
     """Wrapper of scipy.stats.kruskal function."""
     test_val, p_val = kruskal(sample_data, batch_data, **kwargs)
-    alert = detect_alert.alert(p_val, "kruskal_wallis", "numerical", "covariate_drift", le)
+    alert = detect_alert.alert(p_val, "kruskal_wallis", "numerical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using a Kruskal-Wallis test! P-value: {p_val}", le)
     
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
@@ -174,7 +173,7 @@ def compute_kolmogorov_smirnov_test(sample_data: pd.Series,
                                     batch_data: pd.Series, **kwargs):
     """Wrapper of scipy.stats.ks_2samp function."""
     test_val, p_val = ks_2samp(sample_data, batch_data, **kwargs)
-    alert = detect_alert.alert(p_val, "kolmogorov_smirnov", "numerical", "covariate_drift", le)
+    alert = detect_alert.alert(p_val, "kolmogorov_smirnov", "numerical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using a Kolmogorov-Smirnov test! P-value: {p_val}",le)
     
     return {"test_val": test_val, "p_val": p_val, "alert": alert}
 
@@ -224,7 +223,7 @@ def compute_csi_numerical(
 
     # get overall PSI
     csi_total = np.round(sum(csi_df["CSI"]), 3)
-    alert = detect_alert.alert(csi_total , "CSI", "numerical", "covariate_drift", ge)
+    alert = detect_alert.alert(csi_total , "CSI", "numerical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using CSI! CSI value: {csi_total}",ge)
     
     return {"csi_value": csi_total, "alert": alert}
 
@@ -281,7 +280,7 @@ def compute_csi_categorical(
 
     # get overall PSI
     csi_total = np.round(sum(csi_df["CSI"]), 3)
-    alert = detect_alert.alert(csi_total , "CSI", "categorical", "covariate_drift", ge)
+    alert = detect_alert.alert(csi_total , "CSI", "categorical", "covariate_drift", f"Detected covariate drift in column {sample_data.name} using CSI! CSI value: {csi_total}", ge)
 
     return {"csi_value": csi_total, "alert": alert}
 
@@ -312,7 +311,7 @@ def detect_drift_adwin_method(sample_data: pd.Series, batch_data: pd.Series) -> 
         adwin.add_element(data_stream[i])
         if adwin.detected_change():
             alert = 1
-            logger.warning('Change detected in data: ' + str(data_stream[i]) + ' - at index: ' + str(i) + 'for column:' + col_name)
+            alert_logger.warning('Change detected in data: ' + str(data_stream[i]) + ' - at index: ' + str(i) + 'for column:' + col_name)
             
     return {"alert": alert}
     
@@ -351,4 +350,5 @@ def scale_range(input, min, max) -> np.array:
     input += -(np.min(input))
     input /= np.max(input) / (max - min)
     input += min
+    
     return input

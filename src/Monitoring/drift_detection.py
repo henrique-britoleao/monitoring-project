@@ -7,8 +7,9 @@ from skmultiflow.drift_detection import ADWIN, HDDM_A
 import pandas as pd
 import numpy as np
 
-#####  Set logger  #####
-logger = logging.getLogger("main_logger")
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def detect_drift_in_streaming_data(numerical_cols: list,
                                         sample_df: pd.DataFrame, 

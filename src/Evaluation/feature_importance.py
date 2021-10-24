@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import logging
-logger = logging.getLogger(__name__)
-
 import pandas as pd
 import plotly.graph_objects as go
 
 from sklearn.base import ClassifierMixin
 from sklearn.base import clone
 from sklearn.inspection import permutation_importance
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #TODO: clf to pipeline
 def extract_feature_importance(clf: ClassifierMixin, X_train: pd.DataFrame, y_train: pd.Series) -> dict:

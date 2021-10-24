@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-import logging
-logger = logging.getLogger('main_logger')
 
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
 from sklearn.pipeline import Pipeline
 
 import constants as cst
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 ####### PIPELINE  ########
 def build_prediction_pipeline(estimator):

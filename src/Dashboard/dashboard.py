@@ -108,7 +108,7 @@ class DashboardApp:
             st.subheader("Model performance evolution")
             st.write("Visualize classification performance metrics (cross-validation scores using the training data vs. true performance on the batch data:")
             fig_model_performance = model_perf_graph.plot_performance(
-                batch_name=self.batch_name[:-4],
+                batch_name=self.batch_name,
                 batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH,
                 train_perf_path=cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH,
             )

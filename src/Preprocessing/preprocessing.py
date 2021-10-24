@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 #####  Imports  #####
-import logging
-from typing import Tuple
-logger = logging.getLogger(__name__)
+import constants as cst
 
+from typing import Tuple
 from abc import ABC, abstractmethod
 from sklearn.model_selection import train_test_split
 import pandas as pd
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Processors  #####
 class Preprocessor(ABC):
@@ -92,6 +95,17 @@ class MarketingPreprocessor(Preprocessor):
                              'e pipeline.')
         
         return data
+    
+#####  Get Preprocessor  #####
+def get_preprocessor():
+    """TODO"""
+    preprocessor_map = {
+        "MarketingPreprocessor": MarketingPreprocessor
+    }
+    preprocessor = preprocessor_map[cst.selected_dataset_information["preprocessor"]]()
+    
+    return preprocessor
+
 
 def basic_split(df: pd.DataFrame, target_column: str, train_size: float = 0.7, seed=42) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """Splits the dataframe in train, test sets

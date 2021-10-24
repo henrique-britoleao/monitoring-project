@@ -2,18 +2,15 @@
 
 #####  Imports  #####
 from src.monitoring import monitor_runner
+from src.preprocessing.preprocessing import get_preprocessor
 import src.constants as cst
 
 import argparse
 import logging
 
 #####  Set Logger  #####
-# TODO: handle loggers better
-logging.basicConfig(filename = cst.MAIN_LOG_FILE_PATH,
-                    filemode = "w",
-                    level = logging.INFO)
-
-logger = logging.getLogger(__name__)    
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 #####  Main script  #####
 # Set the argument parser
@@ -36,13 +33,15 @@ argument_parser.add_argument(
 # Define main script
 def main(batch_id, mode="process"):
     """Runs monitoring on batch."""
+    logger.info(f'Starting run of main. Parsing batch {batch_id} on mode {mode}')
     # initialize runner
     runner = monitor_runner.MonitorRunner(batch_id)
+    preprocessor = get_preprocessor()
     
     if mode == "process":
-        runner.process_batch(preprocessor=cst.PREPROCESSOR)
+        runner.process_batch(preprocessor=preprocessor)
     if mode == "evaluate":
-        runner.evaluate_batch(preprocessor=cst.PREPROCESSOR)
+        runner.evaluate_batch(preprocessor=preprocessor)
 
         
 if __name__ == "__main__":

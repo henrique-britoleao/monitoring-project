@@ -49,8 +49,11 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
 # Files
 Inputs/*
 Outputs/*
-params/logs/*
+
+# Logs
+logs/* 
 #

@@ -1,15 +1,16 @@
 
 # -*- coding: utf-8 -*-
 
-import logging
-logger = logging.getLogger(__name__)
-
 import pandas as pd
 import plotly.graph_objects as go
 
 from evaluation import feature_importance
 from utils import utils as u
 import constants as cst
+
+#####  Set Logger  #####
+from src.utils.loggers import MainLogger
+logger = MainLogger.getLogger(__name__)
 
 def graph_feature_importance(sample_df: pd.DataFrame, colors: list = ["rgb(0, 0, 100)", "rgb(0, 200, 200)"]):
     """Plot feature importance 
