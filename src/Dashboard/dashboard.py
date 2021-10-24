@@ -2,7 +2,6 @@
 import os
 import sys
 import pandas as pd
-import plotly
 import streamlit as st
 import plotly.express as px
 import datetime
