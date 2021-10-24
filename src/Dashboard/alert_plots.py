@@ -11,7 +11,7 @@ from dashboard import read_alerts
 import constants as cst
 
 
-def alerts_graph(batch_name: str, batch_id: str) -> graphviz.Digraph:
+def alerts_graph(batch_name: str, batch_id: int) -> graphviz.Digraph:
     """
     Plots a graph summarising, for each type of alert, if an alert has been
     raised or not
@@ -53,7 +53,7 @@ def alerts_graph(batch_name: str, batch_id: str) -> graphviz.Digraph:
     return graph
 
 
-def high_level_alert(batch_name: str, batch_id: str) -> list:
+def high_level_alert(batch_name: str, batch_id: int) -> list:
     """
     For each type of alerts, indicates if an alert has been raised
 
