@@ -9,11 +9,17 @@ def plot_performance(
     train_perf_path: str = cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH,
     batch_name: str = "batch1.csv",
 ):
-    """Creates barplot to compare training performance vs batch performance
+    """Plot model performance on the training set (cross-eval) vs on the batch dataset
+
     Args:
-        json_path (str, optional): path to json file with performance metrics of models.
-                                   Defaults to constants.PERFORMANCE_METRICS_FILE_PATH.
-        batch_name (str, optional): Which batch is being analysed. Defaults to "batch1".
+        batch_perf_path (str, optional): json file containing the latest performance metrics
+            computed on the batch data (incl. true labels). Defaults to cst.PERFORMANCE_METRICS_FILE_PATH.
+        train_perf_path (str, optional): json file containing the training metrics. 
+            Defaults to cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH.
+        batch_name (str, optional): batch name. Defaults to "batch1".
+
+    Returns:
+        Figure: plotly figure with performance metrics on the train vs batch sets
     """
     # TRAINING DATA
     # GET VALUES OF TRAIN

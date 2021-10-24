@@ -30,6 +30,14 @@ def graph_feature_importance(sample_df: pd.DataFrame, colors: list = ["rgb(0, 0,
     return fig
 
 def get_feature_importance_to_plot(sample_df):
+    """Compute feature importance using permutation importance on the selected model and the training data
+
+    Args:
+        sample_df (pd.DataFrame): training data
+
+    Returns:
+        pd.DataFrame: dataframe with features as index and importance scores as values
+    """
     model = u.load_model()
     X_train = sample_df.copy()
     for col in [
