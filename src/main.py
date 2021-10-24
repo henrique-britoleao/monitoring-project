@@ -79,13 +79,13 @@ def process_batch(batch_id):
     u.append_to_json(records, cst.MONITORING_METRICS_FILE_PATH)
     
 
-def evaluate_batch(batch_id): # TODO: add possibility to specify batch
+def evaluate_batch(batch_id, name=''): # TODO: add possibility to specify batch
     # build batch name
     batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=batch_id)[:-4]
     # load batch data
     preprocessed_batch = loading.read_csv_from_path(cst.PREPROCESSED_BATCH_FILE_PATH)
     # load model
-    model = u.load_model()
+    model = u.load_model(name)
     
     X_batch = preprocessed_batch.drop(columns=cst.y_name)
     y_batch = preprocessed_batch[cst.y_name]
@@ -95,14 +95,14 @@ def evaluate_batch(batch_id): # TODO: add possibility to specify batch
     u.append_to_json({batch_name: performance_metrics}, cst.PERFORMANCE_METRICS_FILE_PATH)
     
 
-def main(batch_id, mode="process"):
+def main(batch_id, mode="process", name=''):
     if mode == "process":
         process_batch(batch_id)
     if mode == "evaluate":
-        evaluate_batch(batch_id)
+        evaluate_batch(batch_id, name)
         
 
-def batch_preprocess(batch_df: pd.DataFrame, column_types: dict[str, list[str]], preprocessor: preprocessing.Preprocessor):
+def batch_preprocess(batch_df: pd.DataFrame, column_types, preprocessor: preprocessing.Preprocessor):
     return preprocessor(batch_df, column_types)
 
 

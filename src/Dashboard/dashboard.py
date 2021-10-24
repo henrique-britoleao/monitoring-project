@@ -6,12 +6,15 @@ import plotly
 import streamlit as st
 import plotly.express as px
 import datetime
+import json
+import plotly.graph_objects as go
 
 from Evaluation import feature_importance
 
 sys.path.insert(0, "..")
 
 from Loading import loading
+from Dashboard import model_perf_graph
 from Dashboard import concept_plots
 from Dashboard import feature_importance_plots
 from Dashboard import categorical_cov_plots
@@ -21,15 +24,17 @@ from Dashboard import alert_plots
 from Dashboard import show_logs
 from Preprocessing import preprocessing
 from main import main
+from fix_drift import train_drift_adjusted_model
 import constants as cst
 
+
 class DashboardApp:
+    batch_id = 0
     def __init__(self, sample_df):
         self.sample_df = sample_df
         self.batch_df = None
         self.batch_name = None
-        self.batch_id = 1
-        #TODO
+        self.name = ''
         self.option = None
     
     def configure_page(self):
@@ -51,12 +56,14 @@ class DashboardApp:
         option = st.sidebar.selectbox('Pick Dashboard:', ('Monitoring - Overview', 'Model Performance Analysis', 'Feature Distribution Analysis'))
         self.option = option
         uploaded_file = st.sidebar.file_uploader("Choose a file")
+
         if uploaded_file is not None:
             self.batch_df = pd.read_csv(uploaded_file, sep=None, engine='python')
-            self.batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=self.batch_id)
+            DashboardApp.batch_id += 1
+            self.batch_name = cst.BATCH_NAME_TEMPLATE.substitute(id=DashboardApp.batch_id)
             loading.write_csv_from_path(self.batch_df, os.path.join(cst.BATCHES_PATH, self.batch_name))
             self.batch_df = batch_preprocess(self.batch_df, cst.column_types, preprocessing.MarketingPreprocessor())
-            self.batch_id += 1 #increment counter
+
 
     def create_main_pages(self):
         '''
@@ -78,8 +85,8 @@ class DashboardApp:
                     st.subheader('Streaming Data Evolution')
                     st.markdown("Identifying potential concept drift. ")
                     with show_logs.st_stderr("code"):
-                        main(self.batch_id-1)
-                        graph = alert_plots.alerts_graph(self.batch_name, self.batch_id-2)
+                        main(DashboardApp.batch_id-1)
+                        graph = alert_plots.alerts_graph(self.batch_name, DashboardApp.batch_id-2)
                         st.graphviz_chart(graph)
 
 
@@ -87,17 +94,41 @@ class DashboardApp:
                     # Placeholder: Raised alerts 
 
         # Model Performance Analysis
-        if self.option=='Model Performance Analysis' and self.batch_df is not None:
-            st.subheader(f'Feature importance for selected model {cst.selected_model}')
-            st.write('test')
+        if self.option == "Model Performance Analysis" and self.batch_df is not None:
+            main(DashboardApp.batch_id)
+            main(DashboardApp.batch_id, mode="evaluate", name=self.name)
+            st.subheader(f"Feature importance for selected model {cst.selected_model}")
             fig_feature_importance = self.create_feature_importance_plot()
             st.plotly_chart(fig_feature_importance)
+            fig_model_performance = model_perf_graph.plot_performance(
+                batch_name=self.batch_name[:-4],
+                batch_id=DashboardApp.batch_id-1,
+                batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH,
+                train_perf_path=cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH,
+            )
+            st.plotly_chart(fig_model_performance)
+            
+            
+            with open(cst.TRAIN_PERFORMANCE_METRICS_FILE_PATH) as json_file:
+                train_perf = json.load(json_file)
+            metrics = list(train_perf.keys())
+            metrics.pop(4)
+            metric = st.selectbox('Select metric', metrics)
+            fig_perf_evolution = model_perf_graph.plot_perf_evolution(metric)
+            st.write("test")
+            st.plotly_chart(fig_perf_evolution)
+
+            retrain = st.checkbox('Retrain model', value=False)
+            if retrain:
+                train_drift_adjusted_model(DashboardApp.batch_id-1)
+                self.name = "drift_adjusted_marketing_lightgbm"
+
 
         # Feature Distribution Analysis
         if self.option == 'Feature Distribution Analysis' and self.batch_df is not None:
             st.title('Feature Distribution Analysis')
             st.subheader('Column Alerts')
-            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, self.batch_id-2)
+            fig_heatmap = alert_plots.alerts_matrix(self.batch_name, DashboardApp.batch_id-2)
             st.plotly_chart(fig_heatmap)
 
             st.subheader('Numerical Columns')

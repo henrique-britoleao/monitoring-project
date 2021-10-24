@@ -37,7 +37,7 @@ def check_drift_type(batch_id: int) -> str:
 
     numerical_metrics = (
         pd.DataFrame(
-            dict_metrics[0]["batch{}.csv".format(batch_id)]["metrics"][
+            dict_metrics[batch_id-1]["batch{}.csv".format(batch_id)]["metrics"][
                 "covariate_drift_metrics"
             ]["numerical_metrics"]
         )
@@ -46,7 +46,7 @@ def check_drift_type(batch_id: int) -> str:
     )
     categorical_metrics = (
         pd.DataFrame(
-            dict_metrics[0]["batch{}.csv".format(batch_id)]["metrics"][
+            dict_metrics[batch_id-1]["batch{}.csv".format(batch_id)]["metrics"][
                 "covariate_drift_metrics"
             ]["categorical_metrics"]
         )
@@ -55,7 +55,7 @@ def check_drift_type(batch_id: int) -> str:
     )
     binary_metrics = (
         pd.DataFrame(
-            dict_metrics[0]["batch{}.csv".format(batch_id)]["metrics"][
+            dict_metrics[batch_id-1]["batch{}.csv".format(batch_id)]["metrics"][
                 "covariate_drift_metrics"
             ]["binary_metrics"]
         )
@@ -66,7 +66,7 @@ def check_drift_type(batch_id: int) -> str:
     covariate_drift = (
         numerical_metrics.append(categorical_metrics).append(binary_metrics).fillna(0)
     )
-    concept_drift = dict_metrics[0]["batch{}.csv".format(batch_id)]["metrics"]["PSI"][
+    concept_drift = dict_metrics[batch_id-1]["batch{}.csv".format(batch_id)]["metrics"]["PSI"][
         "alert"
     ]
 
