@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
 
-import lightgbm as lgb
+#####  Imports  #####
 from sklearn.ensemble import RandomForestClassifier
+import lightgbm as lgb
+import pandas as pd
 
 from modeling.pipeline_builder import build_prediction_pipeline
 
