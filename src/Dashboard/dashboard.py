@@ -28,6 +28,7 @@ import constants as cst
 class DashboardApp:
     """Class to generate a streamlit app combined all required graphs in 4 pages
     """
+
     def __init__(self, sample_df):
         self.sample_df = sample_df
         self.batch_df = None
@@ -106,7 +107,9 @@ class DashboardApp:
         # Model Performance Analysis
         if self.option == "Model Performance Analysis" and self.batch_df is not None:
             st.subheader("Model performance evolution")
-            st.write("Visualize classification performance metrics (cross-validation scores using the training data vs. true performance on the batch data:")
+            st.write(
+                "Visualize classification performance metrics (cross-validation scores using the training data vs. true performance on the batch data:"
+            )
             fig_model_performance = model_perf_graph.plot_performance(
                 batch_name=self.batch_name,
                 batch_perf_path=cst.PERFORMANCE_METRICS_FILE_PATH,
@@ -115,7 +118,9 @@ class DashboardApp:
 
             st.plotly_chart(fig_model_performance)
             st.subheader(f"Feature importance for selected model {cst.selected_model}")
-            st.write("Visualize the relative feature importance of each feature used in the model using permutation importance:")
+            st.write(
+                "Visualize the relative feature importance of each feature used in the model using permutation importance:"
+            )
             fig_feature_importance = self.create_feature_importance_plot()
             st.plotly_chart(fig_feature_importance)
 
