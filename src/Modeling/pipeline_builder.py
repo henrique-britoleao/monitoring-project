@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from sklearn.preprocessing import OneHotEncoder
+#####  Imports  #####
 from sklearn.compose import make_column_transformer
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
 
 import constants as cst
