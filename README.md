@@ -6,7 +6,7 @@ The goal of the project is to create a pipeline that can handle a binary classif
 problem and monitor the adequateness of the trained model for subsequent batches of 
 data. To do so, the pipeline controls for two different types of drift:
    
-    - Covariate drift: cahnges in the distribution of covariates used to make the predictions
+    - Covariate drift: changes in the distribution of covariates used to make the predictions
     - Concept drift: changes in the output distribution 
 
 The pipeline also checks the performance of the model over the different datasets. 
