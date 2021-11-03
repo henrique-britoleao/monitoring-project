@@ -1,41 +1,175 @@
-{	
-"paths":{"Inputs_path" : "../Inputs/",
-"Outputs_path":"../Outputs/",
-"folder_preprocessed":"Preprocessed/",
-"folder_models":"Models/",
-"folder_metrics":"Metrics/"
-
-},
-
-"path_log" : "../params/logs/logs.log",
-"log_level" : "INFO",
-
-"__comments_on_selections__":"You can choose the dataset of your choice and the model you want with the 2 following parameters",
-"selected_dataset": "stroke",
-"selected_model":"random_forest",
-
-
-"__comments_on_dictionnary__":"Here you have to write all the information needed when you add a new dataset",
-"dict_info_files": {"drift":{"path_file":"dataset_with_drift.csv",
-							"path_file_preprocessed":"dataset_with_drift_preprocessed.csv",
-							"y_name":"class"},
-					"fraude":{"path_file":"creditcard_fraud.csv",
-							"path_file_preprocessed":"creditcard_fraud_preprocessed.csv",
-							"y_name":"Class"},
-					"stroke":{"path_file":"Stroke.csv",
-							"path_file_preprocessed":"Stroke_preprocessed.csv",
-							"y_name":"stroke"},
-					"banking":{"path_file":"banking.csv",
-							"path_file_preprocessed":"banking_preprocessed.csv",
-							"y_name":"deposit_subscription"},	
-					"diabetic":{"path_file":"diabetic.csv",
-							"path_file_preprocessed":"diabetic_preprocessed.csv",
-							"y_name":"readmitted"},	
-					"wine":{"path_file":"wine_drift.csv",
-							"path_file_preprocessed":"wine_drift_preprocessed.csv",
-							"y_name":"quality"},
-					"marketing":{"path_file":"marketing_data.csv",
-							"path_file_preprocessed":"marketing_preprocessed.csv",
-							"y_name":"Response"}								
+{
+	"paths": {
+		"Inputs_path": "Inputs/",
+		"folder_batches": "Batches/",
+		"Outputs_path": "Outputs/",
+		"folder_preprocessed": "Preprocessed/",
+		"folder_predicted": "Predicted/",
+		"folder_models": "Models/",
+		"folder_metrics": "Metrics/",
+		"folder_monitoring": "Monitoring/",
+		"main_logger": "logs/main_logs.log",
+		"debug_logger": "logs/debug_logs.log",
+		"training_logger": "logs/training_logs.log",
+		"alert_logger": "logs/alert_logs.log"
+	},
+	"__comments_on_selections__": "You can choose the dataset of your choice and the model you want with the 2 following parameters",
+	"selected_dataset": "marketing",
+	"selected_model": "lightgbm",
+	"__comments_on_dictionnary__": "Here you have to write all the information needed when you add a new dataset",
+	"dict_info_files": {
+		"drift": {
+			"file_name": "dataset_with_drift.csv",
+			"file_name_preprocessed": "dataset_with_drift_preprocessed.csv",
+			"y_name": "class"
+		},
+		"fraude": {
+			"file_name": "creditcard_fraud.csv",
+			"file_name_preprocessed": "creditcard_fraud_preprocessed.csv",
+			"y_name": "Class"
+		},
+		"stroke": {
+			"file_name": "Stroke.csv",
+			"file_name_preprocessed": "Stroke_preprocessed.csv",
+			"y_name": "stroke"
+		},
+		"banking": {
+			"file_name": "banking.csv",
+			"file_name_preprocessed": "banking_preprocessed.csv",
+			"y_name": "deposit_subscription"
+		},
+		"diabetic": {
+			"file_name": "diabetic.csv",
+			"file_name_preprocessed": "diabetic_preprocessed.csv",
+			"y_name": "readmitted"
+		},
+		"wine": {
+			"file_name": "wine_drift.csv",
+			"file_name_preprocessed": "wine_drift_preprocessed.csv",
+			"y_name": "quality"
+		},
+		"marketing": {
+			"file_name": "marketing_data.csv",
+			"file_name_preprocessed": "marketing_preprocessed.csv",
+			"y_name": "Response",
+			"y_labels": [
+				"No Response",
+				"Response"
+			],
+			"preprocessor": "MarketingPreprocessor",
+			"column_nature": {
+				"categorical_columns": [
+					"Education",
+					"Marital_Status",
+					"Country",
+					"Kidhome",
+					"Teenhome"
+				],
+				"numerical_columns": [
+					"Income",
+					"Recency",
+					"MntWines",
+					"MntFruits",
+					"MntMeatProducts",
+					"MntFishProducts",
+					"MntSweetProducts",
+					"MntGoldProds",
+					"NumDealsPurchases",
+					"NumWebPurchases",
+					"NumCatalogPurchases",
+					"NumStorePurchases",
+					"NumWebVisitsMonth"
+				],
+				"binary_columns": [
+					"AcceptedCmp3",
+					"AcceptedCmp4",
+					"AcceptedCmp5",
+					"AcceptedCmp1",
+					"AcceptedCmp2",
+					"Complain"
+				]
+			},
+			"column_types": {
+				"int": [
+					"Year_Birth",
+					"Kidhome",
+					"Teenhome",
+					"Recency",
+					"MntWines",
+					"MntFruits",
+					"MntMeatProducts",
+					"MntFishProducts",
+					"MntSweetProducts",
+					"MntGoldProds",
+					"NumDealsPurchases",
+					"NumWebPurchases",
+					"NumCatalogPurchases",
+					"NumStorePurchases",
+					"NumWebVisitsMonth",
+					"AcceptedCmp3",
+					"AcceptedCmp4",
+					"AcceptedCmp5",
+					"AcceptedCmp1",
+					"AcceptedCmp2",
+					"Response",
+					"Complain"
+				],
+				"float": [
+					"Income"
+				],
+				"str": [
+					"Education",
+					"Marital_Status",
+					"Country"
+				]
+			},
+			"metrics_setup": {
+				"concept_drift": {
+					"PSI": {
+						"function": "compute_psi",
+						"threshold": 0.2
 					}
+				},
+				"covariate_drift": {
+					"numerical": {
+						"ADWIN": {
+							"function": "detect_drift_adwin_method"
+						},
+						"CSI": {
+							"function": "compute_csi_numerical",
+							"threshold": 0.2
+						},
+						"kruskal_wallis": {
+							"function": "compute_kruskal_wallis_test",
+							"threshold": 0.05
+						},
+						"kolmogorov_smirnov": {
+							"function": "compute_kolmogorov_smirnov_test",
+							"threshold": 0.05
+						}
+					},
+					"categorical": {
+						"CSI": {
+							"function": "compute_csi_categorical",
+							"threshold": 0.2
+						},
+						"chi_squared": {
+							"function": "compute_chi_sq_stats",
+							"threshold": 0.05
+						}
+					},
+					"binary": {
+						"CSI": {
+							"function": "compute_csi_categorical",
+							"threhsold": 0.2
+						},
+						"fisher_test": {
+							"function": "compute_fisher_stats",
+							"threshold": 0.05
+						}
+					}
+				}
+			}
+		}
+	}
 }
