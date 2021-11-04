@@ -1,5 +1,7 @@
 # Model Monitoring Pipeline
 
+![version](https://img.shields.io/badge/version-0.0.1-blue)
+
 ## Overview
 
 The goal of the project is to create a pipeline that can handle a binary classifcation
